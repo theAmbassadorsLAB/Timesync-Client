@@ -1,0 +1,57 @@
+<html>
+<head>
+    <title>Join the Beat</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no,maximum-scale=1">
+    
+    <!-- iPad retina icon -->
+    <link href="resources/img/apple-touch-icon-precomposed-152x152.png"
+          sizes="152x152"
+          rel="apple-touch-icon-precomposed">
+    
+    <!-- iPad retina icon (iOS < 7) -->
+    <link href="resources/img/apple-touch-icon-precomposed-144x144.png"
+          sizes="144x144"
+          rel="apple-touch-icon-precomposed">
+    
+    <!-- iPad non-retina icon -->
+    <link href="resources/img/apple-touch-icon-precomposed-76x76.png"
+          sizes="76x76"
+          rel="apple-touch-icon-precomposed">
+    
+    <!-- iPad non-retina icon (iOS < 7) -->
+    <link href="resources/img/apple-touch-icon-precomposed-72x72.png"
+          sizes="72x72"
+          rel="apple-touch-icon-precomposed">
+    
+    <!-- iPhone 6 Plus icon -->
+    <link href="resources/img/apple-touch-icon-precomposed-180x180.png"
+          sizes="120x120"
+          rel="apple-touch-icon-precomposed">
+    
+    <!-- iPhone retina icon (iOS < 7) -->
+    <link href="resources/img/apple-touch-icon-precomposed-114x114.png"
+          sizes="114x114"
+          rel="apple-touch-icon-precomposed">
+    
+    <!-- iPhone non-retina icon (iOS < 7) -->
+    <link href="resources/img/apple-touch-icon-precomposed-57x57.png"
+          sizes="57x57"
+          rel="apple-touch-icon-precomposed">
+
+    <script src="TimeSync.js"></script>
+</head>
+<body>
+  <div id="progress"></div>
+  <script>
+    var tsClient = new TIMESYNC.Client({debug: true});
+    
+    tsClient.on("syncprogress", function (e) {
+      document.getElementById("progress").innerHTML = Math.floor(e.details * 100) + "%";
+    });
+
+    tsClient.connect("live.theambassadors.nl", 8080);
+
+  </script>
+</body>
