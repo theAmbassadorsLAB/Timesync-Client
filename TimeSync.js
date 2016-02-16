@@ -349,6 +349,13 @@ TIMESYNC.Client.prototype.log = function () {
     }
 };
 
+TIMESYNC.Client.prototype.newMsg = function (type, body) {
+    type = type || 'echo';
+    body = body || '';
+
+    return new TIMESYNC.Message({head: {type: type}, body: body}).bind(this);
+}
+
 
 /** @Class Message
  * TIMESYNC Message Class
