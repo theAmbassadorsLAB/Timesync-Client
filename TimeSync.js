@@ -305,8 +305,6 @@ TIMESYNC.Client.prototype.onConnMessage = function (e) {
     // promote the message object to a TIMESYNC Message instance
     msg = new TIMESYNC.Message(e.data).bind(this);
 
-    this.log("Incomming message", msg);
-
     // call the appropriate message handler
     // Note: Message handlers are defined as on[Message.head.type] camelcased.
     // eg: onPing, where type is 'ping'
@@ -398,6 +396,9 @@ TIMESYNC.Message.prototype.bind = function (scope) {
 
     if (!scope instanceof TIMESYNC.Client) { throw ("Message.bind expects a TIMESYNC.Client instance"); }
 
+    // TODO: hide this.client in the prototype or private vars of Message,
+    // as it now gets encoded into JSON for every message we send to the server.
+
     this.client = scope;
     this.head.clientId = this.client.getId();
 
@@ -407,6 +408,9 @@ TIMESYNC.Message.prototype.bind = function (scope) {
 TIMESYNC.Message.prototype.toString = function () {
     return JSON.stringify(this);
 };
+
+// TODO: implement a callback registry so we don't have to create message handlers
+// for each message type that we send to the server, just to receive a response.
 
 TIMESYNC.Message.prototype.send = function () {
     if (this.validate()) {
