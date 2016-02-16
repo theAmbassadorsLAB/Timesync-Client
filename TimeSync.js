@@ -256,6 +256,10 @@ TIMESYNC.Client.prototype.init = function (cfg) {
         this.log("userCount", msg.body.count);
         this.fireEvent("usercount", msg.body.count);
     });
+
+    this.registerHandler("echo", function (msg) {
+        this.log("echo", msg.body);
+    });
 };
 
 TIMESYNC.Client.prototype.onConnOpen = function () {
