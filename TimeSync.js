@@ -99,6 +99,10 @@ TIMESYNC.Client = function (cfg) {
         server = server || this.config.server;
         port = port || this.config.port;
 
+        // update the config
+        this.config.server = server;
+        this.config.port = port;
+
         var me = this,
             conn;
 
