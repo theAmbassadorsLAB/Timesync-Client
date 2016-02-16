@@ -278,6 +278,8 @@ TIMESYNC.Client.prototype.onConnError = function (e) {
 };
 
 TIMESYNC.Client.prototype.onConnClose = function () {
+    var me = this;
+
     this._setConnected(false);
     // this.setControl(false);
     // setUserCount(false);
@@ -286,8 +288,8 @@ TIMESYNC.Client.prototype.onConnClose = function () {
 
     if (this.config.autoReconnect) {
         setTimeout(function () {
-            this.connect();
-        }, 200);
+            me.connect();
+        }, 1000);
     }
 };
 
