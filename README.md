@@ -1,9 +1,12 @@
 # Timesync-Client
 Javascript Client for the proprietary Ambassadors Timesync Server.
 
+- [TIMESYNC.Client ](#client)
+- [TIMESYNC.Message ](#message)
+- [TIMESYNC.Util ](#util)
 
 
-## TIMESYNC.Client ##
+## <a name="client"></a>TIMESYNC.Client ##
 
 **newMsg** (type, body, callback, scope) : Message  
 Convenience method to create a new message object and automatically bind it to the client. Optionally it allows for attaching a callback method and scope.
@@ -98,7 +101,7 @@ Returns:
 ===
 
 
-## TIMESYNC.Message ##
+## <a name="message"></a>TIMESYNC.Message ##
 
 **bind** (client) : Message  
 Method to bind the message to the client. This is needed so it can be sent to the server thru the client.
@@ -132,6 +135,7 @@ A validation method to make sure the message is poperly formatted. It will throw
 
 Returns:
 - Message
+
 ===
 
 **getType** ( ) : String  
@@ -187,7 +191,7 @@ Properties:
 
 
 
-## TIMESYNC.util ##
+## <a name="util"></a>TIMESYNC.util ##
 
 **capitaliseString** (string) : String  
 
