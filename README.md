@@ -6,10 +6,8 @@ Javascript Client for the Ambassadors Timesync Server.
   * [Properties](#client.properties)
   * [Methods](#client.methods)
   * [Events](#client.events)
-
 - [TIMESYNC.Message](#message)
   * [Methods](#message.methods)
-
 - [TIMESYNC.util](#util)
   * [Methods](#util.methods)
 
