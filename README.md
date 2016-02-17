@@ -26,7 +26,6 @@ Javascript Client for the proprietary Ambassadors Timesync Server.
 - [removeListener](#client.removelistener)
 - [send](#client.send)
 
-
 <a name="client.addlistener"></a>**addListener** (type, listener) : Client 
 
 Adds an event listener to the client. For a list of events take a look at the Events section.
@@ -214,7 +213,22 @@ Parameters:
 
 ## <a name="message"></a>TIMESYNC.Message ##
 
-**bind** (client) : Message  
+Message protocol inspired by 0MQ.
+
+- [bind](#message.bind)
+- [getBody](#message.getbody)
+- [getClient](#message.getclient)
+- [getTS](#message.getts)
+- [getType](#message.gettype)
+- [send](#message.send)
+- [setBody](#message.setbody)
+- [setTs](#message.setts)
+- [setType](#message.settype)
+- [validate](#message.validate)
+
+===
+
+<a name="message.bind"></a>**bind** (client) : Message  
 Method to bind the message to the client. This is needed so it can be sent to the server thru the client.
 
 Parameters:
@@ -225,7 +239,12 @@ Returns:
 
 ===
 
-**getClient** ( ) : Client  
+<a name="message.getbody"></a>**getBody** ( ) : String / Object  
+Convenience method to get the body contents of a message object.
+
+===
+
+<a name="message.getclient"></a>**getClient** ( ) : Client  
 Method to get the client of this message, if it has been bound before.
 
 Returns:
@@ -233,42 +252,7 @@ Returns:
 
 ===
 
-**send** ( ) : Message  
-Method to send the message to the server. Note: the message needs to be bound to the client with the 'bind' method first.
-
-Returns:
-- Message
-
-===
-
-**validate** ( ) : Message  
-A validation method to make sure the message is poperly formatted. It will throw up errors when it encounters problems, but always returns the Message object so it can be used in concatenation.
-
-Returns:
-- Message
-
-===
-
-**getType** ( ) : String  
-Convenience method to get the type of a message object.
-
-Returns:
-- String
-
-===
-
-**setType** (type) : Message  
-Convenience method to set the type of the message object.
-
-Parameters:
-- type (String)
-
-Returns:
-- Message
-
-===
-
-**getTs** ( ) : Integer  
+<a name="message.getts"></a>**getTs** ( ) : Integer  
 Convenience method to get the message timestamp.
 
 Returns:
@@ -276,23 +260,23 @@ Returns:
 
 ===
 
-**setTs** (timestamp) : Message  
-Convenience method to set the dispatch timestamp of a message. The timestamp lives in the message head. This rarely needs to bet set directly though, as it is set as soon as the message is sent to the server, which is what you normally would want.
+<a name="message.gettype"></a>**getType** ( ) : String  
+Convenience method to get the type of a message object.
 
-Parameters:
-- timestamp (Integer)
+Returns:
+- String
+
+===
+
+<a name="message.send"></a>**send** ( ) : Message  
+Method to send the message to the server. Note: the message needs to be bound to the client with the 'bind' method first.
 
 Returns:
 - Message
 
 ===
 
-**getBody** ( ) : String / Object  
-Convenience method to get the body contents of a message object.
-
-===
-
-**setBody** (body) : Message  
+<a name="message.setbody"></a>**setBody** (body) : Message  
 Convenience method to directly set the body contents of a message object.
 
 Parameters:
@@ -303,15 +287,53 @@ Returns:
 
 ===
 
+<a name="message.setts"></a>**setTs** (timestamp) : Message  
+Convenience method to set the dispatch timestamp of a message. The timestamp lives in the message head. This rarely needs to bet set directly though, as it is set as soon as the message is sent to the server, which is what you normally would want.
+
+Parameters:
+- timestamp (Integer)
+
+Returns:
+- Message
+
+===
+
+<a name="message.settype"></a>**setType** (type) : Message  
+Convenience method to set the type of the message object.
+
+Parameters:
+- type (String)
+
+Returns:
+- Message
+
+===
+
+<a name="message.validate"></a>**validate** ( ) : Message  
+A validation method to make sure the message is poperly formatted. It will throw up errors when it encounters problems, but always returns the Message object so it can be used in concatenation.
+
+Returns:
+- Message
+
+===
+
 
 
 ## <a name="util"></a>TIMESYNC.util ##
 
-**capitaliseString** (string) : String  
+General utility methods.
+
+- [capitaliseString](#util.capitalisestring)
+- [formatTime](#util.formattime)
+- [uuid4](#util.uuid4)
 
 ===
 
-**formatTime** (milliseconds) : String  
+<a name="util.capitalisestring"></a>**capitaliseString** (string) : String  
+
+===
+
+<a name="util.formattime"></a>**formatTime** (milliseconds) : String  
 Formats an integer as milliseconds into a time string like: hours:minutes:seconds:milliseconds  
 
 Returns: 
@@ -319,7 +341,7 @@ Returns:
 
 ===
 
-**uuid4** ( ) : String  
+<a name="util.uuid4"></a>**uuid4** ( ) : String  
 Generates a Unique Universal Identifier.  
 For example: ```91bb1fe1-e80e-452e-b506-2a83002caf78```
 
