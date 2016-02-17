@@ -490,10 +490,6 @@ TIMESYNC.util.capitaliseString = function (string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
-// TIMESYNC.util.pack = function (msg) {
-//     return JSON.stringify(msg);
-// };
-
 TIMESYNC.util.formatTime = function (ms) {
     var date = new Date(ms),
         hours = date.getHours(),
