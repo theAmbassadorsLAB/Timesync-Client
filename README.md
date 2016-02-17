@@ -291,12 +291,12 @@ Returns:
 
 ===
 
-<a name="client.registerhandler"></a>**registerHandler** (type, listener) : Client  
-Method to register event handlers. For a full list of supported events please see the Events section.
+<a name="client.registerhandler"></a>**registerHandler** (type, handler) : Client  
+Method to register Message handlers. For a full list of supported events please see the Events section.
 
 Parameters:
 - type : String
-- listener : Function
+- handler : Function
 
 Returns:
 - Client
