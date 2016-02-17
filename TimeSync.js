@@ -300,10 +300,19 @@ TIMESYNC.Client.prototype.onConnClose = function () {
 // message router for the websocket connection
 TIMESYNC.Client.prototype.onConnMessage = function (e) {
     var msg,
-        handlerType;
+        handlerType,
+        callback;
 
     // promote the message object to a TIMESYNC Message instance
     msg = new TIMESYNC.Message(e.data).bind(this);
+
+    // check if we have registered a callback on the message
+    callback = this.msgCallbacks[msg.id];
+    if (callback) {
+        callback.fn.call(callback.scope, msg.getBody());
+        // cleanup the callback
+        delete this.msgCallbacks[msg.id];
+    }
 
     // call the appropriate message handler
     // Note: Message handlers are defined as on[Message.head.type] camelcased.
@@ -312,7 +321,7 @@ TIMESYNC.Client.prototype.onConnMessage = function (e) {
     if (this.msgHandlers.hasOwnProperty(handlerType)) {
         this.msgHandlers[handlerType].call(this, msg, this.getConnection());
 
-    } else {
+    } else if (!callback) {
         this.log("warn", "No handler registered for type '" + msg.head.type + "' with Message", msg);
     }
 };
@@ -347,13 +356,21 @@ TIMESYNC.Client.prototype.log = function () {
     }
 };
 
-TIMESYNC.Client.prototype.newMsg = function (type, body) {
+TIMESYNC.Client.prototype.newMsg = function (type, body, callback, scope) {
     type = type || 'echo';
     body = body || '';
 
-    return new TIMESYNC.Message({head: {type: type}, body: body}).bind(this);
-}
+    var msg = new TIMESYNC.Message({head: {type: type}, body: body}).bind(this);
 
+    // register the callback
+    if (callback) {
+        this.msgCallbacks[msg.id] = {fn: callback, scope: scope};
+    }
+
+    return msg;
+};
+
+TIMESYNC.Client.prototype.msgCallbacks = {}; 
 
 /** @Class Message
  * TIMESYNC Message Class
