@@ -8,7 +8,26 @@ Javascript Client for the proprietary Ambassadors Timesync Server.
 
 ## <a name="client"></a>TIMESYNC.Client ##
 
-**newMsg** (type, body, callback, scope) : Message  
+- [newMsg](#client.newmsg)
+- [getId](#client.getid)
+- [getConnection](#client.getconnection)
+- [getConnected](#client.getconnected)
+- [getClockOffset](#client.getclockoffset)
+- [getSyncProgress](#client.getsyncprogress)
+- [isSync](#client.issync)
+- [connect](#client.connect)
+- [disconnect](#client.disconnect)
+- [send](#client.send)
+- [clock](#client.clock)
+- [now](#client.now)
+- [addListener](#client.addlistener)
+- [fireEvent](#client.fireevent)
+- [removeListener](#client.removelistener)
+- [registerHandler](#client.registerhandler)
+- [log](#client.log)
+
+
+<a name="client.newmsg"></a>**newMsg** (type, body, callback, scope) : Message  
 Convenience method to create a new message object and automatically bind it to the client. Optionally it allows for attaching a callback method and scope.
 
 ```
@@ -36,67 +55,67 @@ Returns:
 
 ===
 
-**getId** ( ) : UUID  
+<a name="client.getid"></a>**getId** ( ) : UUID  
 
 ===
 
-**getConnection** ( ) : Websocket Connection  
+<a name="client.getconnection"></a>**getConnection** ( ) : Websocket Connection  
 
 ===
 
-**getConnected** ( ) : Boolean  
+<a name="client.getconnected"></a>**getConnected** ( ) : Boolean  
 
 ===
 
-**getClockOffset** ( ) : Integer  
+<a name="client.getclockoffset"></a>**getClockOffset** ( ) : Integer  
 
 ===
 
-**getSyncProgress** ( ) : Float  
+<a name="client.getsyncprogress"></a>**getSyncProgress** ( ) : Float  
 
 ===
 
-**isSync** ( ) : Boolean  
+<a name="client.issync"></a>**isSync** ( ) : Boolean  
 
 ===
 
-**connect** (server, port) : Websocket Connection  
+<a name="client.connect"></a>**connect** (server, port) : Websocket Connection  
 
 ===
 
-**disconnect** ( )  
+<a name="client.disconnect"></a>**disconnect** ( )  
 
 ===
 
-**send** (msg)  
+<a name="client.send"></a>**send** (msg)  
 
 ===
 
-**clock** ( ) : Integer  
+<a name="client.clock"></a>**clock** ( ) : Integer  
 
 ===
 
-**now** ( ) : Integer  
+<a name="client.now"></a>**now** ( ) : Integer  
 
 ===
 
-**addListener** (type, listener)  
+<a name="client.addlistener"></a>**addListener** (type, listener)  
 
 ===
 
-**fireEvent** (event, details)  
+<a name="client.fireevent"></a>**fireEvent** (event, details)  
 
 ===
 
-**removeListener** (type, listener)  
+<a name="client.removelistener"></a>**removeListener** (type, listener)  
 
 ===
 
-**registerHandler** (name, fn)  
+<a name="client.registerhandler"></a>**registerHandler** (name, fn)  
 
 ===
 
-**log** (arguments)  
+<a name="client.log"></a>**log** (arguments)  
 
 ===
 
