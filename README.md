@@ -148,7 +148,7 @@ Returns:
 
 ===
 
-**formatTime** (milliseconds) : Integer  
+**formatTime** (milliseconds) : String  
 Formats an integer as milliseconds into a time string like: hours:minutes:seconds:milliseconds  
 
 Returns: 
