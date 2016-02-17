@@ -3,7 +3,7 @@ Javascript Client for the proprietary Ambassadors Timesync Server.
 
 - [TIMESYNC.Client ](#client)
 - [TIMESYNC.Message ](#message)
-- [TIMESYNC.Util ](#util)
+- [TIMESYNC.util ](#util)
 
 
 ## <a name="client"></a>TIMESYNC.Client ##
@@ -25,6 +25,8 @@ Javascript Client for the proprietary Ambassadors Timesync Server.
 - [registerHandler](#client.registerhandler)
 - [removeListener](#client.removelistener)
 - [send](#client.send)
+
+===
 
 <a name="client.addlistener"></a>**addListener** (type, listener) : Client 
 
@@ -73,7 +75,7 @@ Method to fire an event. Any prior registered event listeners will be executed.
 
 Parameters:
 - event : String
-- details : String / Object / Array
+- details : Anything
 
 Returns:
 - Client
@@ -160,7 +162,7 @@ tsClient.newMsg('join_room',
 Parameters:
 
 - type : String
-- body : String / Object
+- body : Anything JSON serializable
 - callback : Function (optional)
 - scope : this reference (optional)
 
@@ -213,7 +215,20 @@ Parameters:
 
 ## <a name="message"></a>TIMESYNC.Message ##
 
-Message protocol inspired by 0MQ.
+Message protocol inspired by 0MQ. Each Message instance contains a unique identifier and is structured with a head and body as follows:
+```
+  Message {
+    id: uuid4 (String),
+    head: {
+      type: message type (String),
+      ts: timestamp (Integer),
+      clientId: uuid (String)
+    },
+    body: {
+      ...
+    }
+  }
+```
 
 - [bind](#message.bind)
 - [getBody](#message.getbody)
@@ -239,7 +254,7 @@ Returns:
 
 ===
 
-<a name="message.getbody"></a>**getBody** ( ) : String / Object  
+<a name="message.getbody"></a>**getBody** ( ) : Anything JSON serializable
 Convenience method to get the body contents of a message object.
 
 ===
@@ -280,7 +295,7 @@ Returns:
 Convenience method to directly set the body contents of a message object.
 
 Parameters:
-- body (String / Object / Array)
+- body (Anything JSON serializable)
 
 Returns:
 - Message
