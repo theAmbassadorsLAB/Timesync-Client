@@ -154,7 +154,7 @@ Body:
 ===
 
 <a name="client.addlistener"></a>**addListener** (type, listener) : Client  
-Adds an event listener to the client. For a list of events take a look at the Events section.
+Adds an event listener to the client. For a list of events take a look at the [Events](#client.events) section.
 
 Parameters:
 - type : String
@@ -292,7 +292,7 @@ Returns:
 ===
 
 <a name="client.registerhandler"></a>**registerHandler** (type, handler) : Client  
-Method to register Message handlers. For a full list of supported events please see the Events section.
+Method to register Message handlers. For a full list of supported Messages please see the [Messages](#client.messages) section.
 
 Parameters:
 - type : String
