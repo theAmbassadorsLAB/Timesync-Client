@@ -1,10 +1,15 @@
 # Timesync-Client
 Javascript Client for the Ambassadors Timesync Server.
 
-- [TIMESYNC.Client ](#client)
-- [TIMESYNC.Message ](#message)
-- [TIMESYNC.util ](#util)
-
+- [TIMESYNC.Client](#client)
+  * [Messages](#client.messages)
+  * [Properties](#client.properties)
+  * [Methods](#client.methods)
+  * [Events](#client.events)
+- [TIMESYNC.Message](#message)
+  * [Methods](#message.methods)
+- [TIMESYNC.util](#util)
+  * [Methods](#util.methods)
 
 ## <a name="client"></a>TIMESYNC.Client ##
 
@@ -17,6 +22,8 @@ Apart from establishing an accurate sync, the server exposes several other featu
 The Server will act on a specific set of Message types as described below, but will broadcast any 'unknown' messages to all users of the same room. This is great to instantly push application state from any user to all other users. Think of a play / pause event, or game start event etc.
 
 Currently the following Server communication is supported:
+
+### <a name="client.messages"></a>Messages:
 
 - [clockOffset](#server.clockoffset) _(private)_
 - [echo](#server.echo)
@@ -117,7 +124,14 @@ Returns:
 
 ===
 
-### Methods:
+### <a name="client.properties"></a>Properties:
+- debug : Boolean,  enable debug messages.
+- server : String, the server address to connect to.
+- port : Integer, the server port to connect on.
+
+===
+
+### <a name="client.methods"></a>Methods:
 
 - [addListener](#client.addlistener)
 - [clock](#client.clock)
@@ -306,7 +320,7 @@ Parameters:
 
 ===
 
-### Events:
+### <a name="client.events"></a>Events:
 
 - [connected](#events.connected)
 - [connectionerror](#events.connectionerror)
@@ -373,6 +387,7 @@ Message protocol inspired by 0MQ. Each Message instance contains a unique identi
     }
   }
 ```
+### <a name="message.methods"></a>Methods:
 
 - [bind](#message.bind)
 - [getBody](#message.getbody)
@@ -481,6 +496,8 @@ Returns:
 ## <a name="util"></a>TIMESYNC.util ##
 
 General utility methods.
+
+### <a name="util.methods"></a>Methods:
 
 - [capitaliseString](#util.capitalisestring)
 - [formatTime](#util.formattime)
