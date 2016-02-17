@@ -34,7 +34,7 @@ Currently the following Server communication is supported:
 - [ping](#server.ping) _(private)_
 - [pong](#server.pong) _(private)_
 - [request_new_room](#server.request_new_room)
-- [room_properties_changed](#server.room_properties_changed)
+- [room_properties_changed](#server.room_properties_changed) _(private)_
 - [set_room_properties](#server.set_room_properties)
 - [userCount](#server.set_room_properties) _(private)_
 
