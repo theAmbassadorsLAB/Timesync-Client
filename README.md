@@ -31,71 +31,133 @@ Parameters:
 Returns:
  - Message object
 
+===
 
+**getId** ( ) : UUID  
 
-**getId** ( ) : UUID
+===
 
-**getConnection** ( ) : Websocket Connection
+**getConnection** ( ) : Websocket Connection  
 
-**getConnected** ( ) : Boolean
+===
 
-**getClockOffset** ( ) : Integer
+**getConnected** ( ) : Boolean  
 
-**getSyncProgress** ( ) : Float
+===
 
-**isSync** ( ) : Boolean
+**getClockOffset** ( ) : Integer  
 
-**connect** (server, port) : Websocket Connection
+===
 
-**disconnect** ( )
+**getSyncProgress** ( ) : Float  
 
-**send** (msg)
+===
 
-**clock** ( ) : Integer
+**isSync** ( ) : Boolean  
 
-**now** ( ) : Integer
+===
 
-**addListener** (type, listener)
+**connect** (server, port) : Websocket Connection  
 
-**fireEvent** (event, details)
+===
 
-**removeListener** (type, listener)
+**disconnect** ( )  
 
-**registerHandler** (name, fn) : 
+===
 
-**log** (arguments)
+**send** (msg)  
+
+===
+
+**clock** ( ) : Integer  
+
+===
+
+**now** ( ) : Integer  
+
+===
+
+**addListener** (type, listener)  
+
+===
+
+**fireEvent** (event, details)  
+
+===
+
+**removeListener** (type, listener)  
+
+===
+
+**registerHandler** (name, fn)  
+
+===
+
+**log** (arguments)  
+
+===
 
 
 ## TIMESYNC.Message ##
 
-**bind** (client) : Message
+**bind** (client) : Message  
 
-**getClient** ( ) : Client
+===
 
-**send** ( ) : Message
+**getClient** ( ) : Client  
 
-**validate** ( ) : Message
+===
 
-**getType** ( ) : String
+**send** ( ) : Message  
 
-**setType** (type) : Message
+===
 
-**getTs** ( ) : Integer
+**validate** ( ) : Message  
 
-**setTs** (timestamp) : Message
+===
 
-**getBody** ( ) : String / Object
+**getType** ( ) : String  
 
-**setBody** (body) : Message
+===
+
+**setType** (type) : Message  
+
+===
+
+**getTs** ( ) : Integer  
+
+===
+
+**setTs** (timestamp) : Message  
+
+===
+
+**getBody** ( ) : String / Object  
+
+===
+
+**setBody** (body) : Message  
+
+===
 
 
 
 ## TIMESYNC.util ##
 
-**capitaliseString** (string) : String
+**capitaliseString** (string) : String  
 
-**formatTime** (milliseconds) : Integer
+===
 
-**uuid4** ( ) : String
+**formatTime** (milliseconds) : Integer  
 
-**emptyFn** ( ) : Object
+===
+
+**uuid4** ( ) : String  
+Generates a Unique Universal Identifier.  
+For example: ```91bb1fe1-e80e-452e-b506-2a83002caf78```
+
+**Returns:**
+- UUID : String
+
+===
+
