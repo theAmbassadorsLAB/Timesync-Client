@@ -28,8 +28,7 @@ Javascript Client for the proprietary Ambassadors Timesync Server.
 
 ===
 
-<a name="client.addlistener"></a>**addListener** (type, listener) : Client 
-
+<a name="client.addlistener"></a>**addListener** (type, listener) : Client  
 Adds an event listener to the client. For a list of events take a look at the Events section.
 
 Parameters:
@@ -42,7 +41,6 @@ Returns:
 ===
 
 <a name="client.clock"></a>**clock** ( ) : Integer  
-
 Returns the offset corrected current time. If the offset has not been established a warning will be printed in the logs.
 
 Returns:
@@ -51,7 +49,6 @@ Returns:
 ===
 
 <a name="client.connect"></a>**connect** (server, port) : Websocket Connection  
-
 Initiates a connection to the server. If no server and port parameters are provided it will grab them from the initial client config.
 
 Parameters:
@@ -64,13 +61,11 @@ Returns:
 ===
 
 <a name="client.disconnect"></a>**disconnect** ( )  
-
 Closes the server connection.
 
 ===
 
-<a name="client.fireevent"></a>**fireEvent** (event, details) : Client 
-
+<a name="client.fireevent"></a>**fireEvent** (event, details) : Client  
 Method to fire an event. Any prior registered event listeners will be executed.
 
 Parameters:
@@ -83,7 +78,6 @@ Returns:
 ===
 
 <a name="client.getclockoffset"></a>**getClockOffset** ( ) : Integer  
-
 Returns the time offset as estimated by the server
 
 Returns:
@@ -92,7 +86,6 @@ Returns:
 ===
 
 <a name="client.getconnected"></a>**getConnected** ( ) : Boolean  
-
 Method to return the connection state. Returns true if connected, false if not.
 
 Returns:
@@ -101,7 +94,6 @@ Returns:
 ===
 
 <a name="client.getconnection"></a>**getConnection** ( ) : Websocket Connection  
-
 Method to return the current websocket connection.
 
 Returns:
@@ -110,7 +102,6 @@ Returns:
 ===
 
 <a name="client.getid"></a>**getId** ( ) : UUID  
-
 Method to return the ID of the Client instance.
 
 Returns:
@@ -119,7 +110,6 @@ Returns:
 ===
 
 <a name="client.getsyncprogress"></a>**getSyncProgress** ( ) : Float  
-
 Method to return the current time syncing progress. Note: alternatively one could use the 'syncprogress' event to receive regular updates on the sync progress.
 
 Returns:
@@ -128,7 +118,6 @@ Returns:
 ===
 
 <a name="client.issync"></a>**isSync** ( ) : Boolean  
-
 Method to return the sync state. Returns true if a sync has been established, false if not.
 
 Returns:
@@ -137,13 +126,11 @@ Returns:
 ===
 
 <a name="client.log"></a>**log** (arguments)  
-
 Convenience method to log console messages that will be honor the debug state as defined in the Client config.
 
 ===
 
 <a name="client.newmsg"></a>**newMsg** (type, body, callback, scope) : Message  
-
 Convenience method to create a new message object and automatically bind it to the client. Optionally it allows for attaching a callback method and scope.
 
 ```
@@ -172,7 +159,6 @@ Returns:
 ===
 
 <a name="client.now"></a>**now** ( ) : Integer  
-
 Convenience method to get the current time in milliseconds without offset. Note: use clock() to get the current time with offset correction.
 
 Returns:
@@ -180,8 +166,7 @@ Returns:
 
 ===
 
-<a name="client.registerhandler"></a>**registerHandler** (type, listener) : Client 
-
+<a name="client.registerhandler"></a>**registerHandler** (type, listener) : Client  
 Method to register event handlers. For a full list of supported events please see the Events section.
 
 Parameters:
@@ -194,7 +179,6 @@ Returns:
 ===
 
 <a name="client.removelistener"></a>**removeListener** (type, listener)  
-
 Removes a previously registere event listener
 
 Parameters:
@@ -204,7 +188,6 @@ Parameters:
 ===
 
 <a name="client.send"></a>**send** (msg)  
-
 Method to send a Message to the server. The 'msg' can be supplied as an instantiated Message object, a config object or JSON formatted string.
 
 Parameters:
@@ -212,6 +195,56 @@ Parameters:
 
 ===
 
+### Events
+
+- [connected](#events.connected)
+- [connectionerror](#events.connectionerror)
+- [disconnected](#events.disconnected)
+- [syncestablished](#events.syncestablished)
+- [syncprogress](#events.syncprogress)
+- [usercount](#events.usercount)
+
+<a name="events.connected"></a>**connected** ( )  
+Fires when the client has successfully initiated a server connection.
+
+==
+
+<a name="events.connectionerror"></a>**connectionerror** (e)  
+Fires when the client has successfully initiated a server connection.
+
+Parameters:
+- e : Error
+
+===
+
+<a name="events.disconnected"></a>**disconnected** (e)  
+Fires when the client has been disconnected from the server.
+
+===
+
+<a name="events.syncestablished"></a>**syncestablished** (offset)  
+Fires when the client and server have successfully estimated the time offset.
+
+Parameters:
+- offset : Integer
+
+===
+
+<a name="events.syncprogress"></a>**syncprogress** (progress)  
+Fires when the sync progress changes.
+
+Parameters:
+- progress : Float
+
+===
+
+<a name="events.usercount"></a>**usercount** (count)  
+Fires when the usercount changes. This happends when people join or leave the room.
+
+Parameters:
+- count : Integer
+
+===
 
 ## <a name="message"></a>TIMESYNC.Message ##
 
@@ -254,7 +287,7 @@ Returns:
 
 ===
 
-<a name="message.getbody"></a>**getBody** ( ) : Anything JSON serializable
+<a name="message.getbody"></a>**getBody** ( ) : Anything JSON serializable  
 Convenience method to get the body contents of a message object.
 
 ===
@@ -345,7 +378,6 @@ General utility methods.
 ===
 
 <a name="util.capitalisestring"></a>**capitaliseString** (string) : String  
-
 Method to promote the first character of a string to uppercase.
 
 Parameters:
