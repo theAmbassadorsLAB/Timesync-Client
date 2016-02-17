@@ -149,6 +149,10 @@ Returns:
 ===
 
 **formatTime** (milliseconds) : Integer  
+Formats an integer as milliseconds into a time string like: hours:minutes:seconds:milliseconds  
+
+Returns: 
+- timestring : String
 
 ===
 
@@ -156,7 +160,7 @@ Returns:
 Generates a Unique Universal Identifier.  
 For example: ```91bb1fe1-e80e-452e-b506-2a83002caf78```
 
-**Returns:**
+Returns:
 - UUID : String
 
 ===
