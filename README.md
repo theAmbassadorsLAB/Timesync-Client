@@ -101,42 +101,87 @@ Returns:
 ## TIMESYNC.Message ##
 
 **bind** (client) : Message  
+Method to bind the message to the client. This is needed so it can be sent to the server thru the client.
+
+Properties:
+- client (Client)
+
+Returns:
+- Message
 
 ===
 
 **getClient** ( ) : Client  
+Method to get the client of this message, if it has been bound before.
+
+Returns:
+- Client
 
 ===
 
 **send** ( ) : Message  
+Method to send the message to the server. Note: the message needs to be bound to the client with the 'bind' method first.
+
+Returns:
+- Message
 
 ===
 
 **validate** ( ) : Message  
+A validation method to make sure the message is poperly formatted. It will throw up errors when it encounters problems, but always returns the Message object so it can be used in concatenation.
 
+Returns:
+- Message
 ===
 
 **getType** ( ) : String  
+Convenience method to get the type of a message object.
+
+Returns:
+- String
 
 ===
 
 **setType** (type) : Message  
+Convenience method to set the type of the message object.
+
+Properties:
+- type (String)
+
+Returns:
+- Message
 
 ===
 
 **getTs** ( ) : Integer  
+Convenience method to get the message timestamp.
+
+Returns:
+- Integer
 
 ===
 
 **setTs** (timestamp) : Message  
+Convenience method to set the dispatch timestamp of a message. The timestamp lives in the message head. This rarely needs to bet set directly though, as it is set as soon as the message is sent to the server, which is what you normally would want.
+
+Properties:
+- timestamp (Integer)
+
+Returns:
+- Message
 
 ===
 
 **getBody** ( ) : String / Object  
+Convenience method to get the body contents of a message object.
 
 ===
 
 **setBody** (body) : Message  
+Convenience method to directly set the body contents of a message object.
+
+Properties:
+- body (String / Object / Array)
 
 ===
 
@@ -152,7 +197,7 @@ Returns:
 Formats an integer as milliseconds into a time string like: hours:minutes:seconds:milliseconds  
 
 Returns: 
-- timestring : String
+- String
 
 ===
 
@@ -161,7 +206,7 @@ Generates a Unique Universal Identifier.
 For example: ```91bb1fe1-e80e-452e-b506-2a83002caf78```
 
 Returns:
-- UUID : String
+- String
 
 ===
 
