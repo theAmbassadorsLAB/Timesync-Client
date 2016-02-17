@@ -8,24 +8,72 @@ Javascript Client for the proprietary Ambassadors Timesync Server.
 
 ## <a name="client"></a>TIMESYNC.Client ##
 
-- [newMsg](#client.newmsg)
-- [getId](#client.getid)
-- [getConnection](#client.getconnection)
-- [getConnected](#client.getconnected)
-- [getClockOffset](#client.getclockoffset)
-- [getSyncProgress](#client.getsyncprogress)
-- [isSync](#client.issync)
+- [addListener](#client.addlistener)
+- [clock](#client.clock)
 - [connect](#client.connect)
 - [disconnect](#client.disconnect)
-- [send](#client.send)
-- [clock](#client.clock)
-- [now](#client.now)
-- [addListener](#client.addlistener)
 - [fireEvent](#client.fireevent)
-- [removeListener](#client.removelistener)
-- [registerHandler](#client.registerhandler)
+- [getClockOffset](#client.getclockoffset)
+- [getConnected](#client.getconnected)
+- [getConnection](#client.getconnection)
+- [getId](#client.getid)
+- [getSyncProgress](#client.getsyncprogress)
+- [isSync](#client.issync)
 - [log](#client.log)
+- [newMsg](#client.newmsg)
+- [now](#client.now)
+- [registerHandler](#client.registerhandler)
+- [removeListener](#client.removelistener)
+- [send](#client.send)
 
+
+<a name="client.addlistener"></a>**addListener** (type, listener)  
+
+===
+
+<a name="client.clock"></a>**clock** ( ) : Integer  
+
+===
+
+<a name="client.connect"></a>**connect** (server, port) : Websocket Connection  
+
+===
+
+<a name="client.disconnect"></a>**disconnect** ( )  
+
+===
+
+<a name="client.fireevent"></a>**fireEvent** (event, details)  
+
+===
+
+<a name="client.getclockoffset"></a>**getClockOffset** ( ) : Integer  
+
+===
+
+<a name="client.getconnected"></a>**getConnected** ( ) : Boolean  
+
+===
+
+<a name="client.getconnection"></a>**getConnection** ( ) : Websocket Connection  
+
+===
+
+<a name="client.getid"></a>**getId** ( ) : UUID  
+
+===
+
+<a name="client.getsyncprogress"></a>**getSyncProgress** ( ) : Float  
+
+===
+
+<a name="client.issync"></a>**isSync** ( ) : Boolean  
+
+===
+
+<a name="client.log"></a>**log** (arguments)  
+
+===
 
 <a name="client.newmsg"></a>**newMsg** (type, body, callback, scope) : Message  
 Convenience method to create a new message object and automatically bind it to the client. Optionally it allows for attaching a callback method and scope.
@@ -55,59 +103,7 @@ Returns:
 
 ===
 
-<a name="client.getid"></a>**getId** ( ) : UUID  
-
-===
-
-<a name="client.getconnection"></a>**getConnection** ( ) : Websocket Connection  
-
-===
-
-<a name="client.getconnected"></a>**getConnected** ( ) : Boolean  
-
-===
-
-<a name="client.getclockoffset"></a>**getClockOffset** ( ) : Integer  
-
-===
-
-<a name="client.getsyncprogress"></a>**getSyncProgress** ( ) : Float  
-
-===
-
-<a name="client.issync"></a>**isSync** ( ) : Boolean  
-
-===
-
-<a name="client.connect"></a>**connect** (server, port) : Websocket Connection  
-
-===
-
-<a name="client.disconnect"></a>**disconnect** ( )  
-
-===
-
-<a name="client.send"></a>**send** (msg)  
-
-===
-
-<a name="client.clock"></a>**clock** ( ) : Integer  
-
-===
-
 <a name="client.now"></a>**now** ( ) : Integer  
-
-===
-
-<a name="client.addlistener"></a>**addListener** (type, listener)  
-
-===
-
-<a name="client.fireevent"></a>**fireEvent** (event, details)  
-
-===
-
-<a name="client.removelistener"></a>**removeListener** (type, listener)  
 
 ===
 
@@ -115,7 +111,11 @@ Returns:
 
 ===
 
-<a name="client.log"></a>**log** (arguments)  
+<a name="client.removelistener"></a>**removeListener** (type, listener)  
+
+===
+
+<a name="client.send"></a>**send** (msg)  
 
 ===
 
