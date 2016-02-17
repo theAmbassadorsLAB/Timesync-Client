@@ -27,55 +27,122 @@ Javascript Client for the proprietary Ambassadors Timesync Server.
 - [send](#client.send)
 
 
-<a name="client.addlistener"></a>**addListener** (type, listener)  
+<a name="client.addlistener"></a>**addListener** (type, listener) : Client 
+
+Adds an event listener to the client. For a list of events take a look at the Events section.
+
+Parameters:
+- type : String
+- listener : Function
+
+Returns:
+- Client
 
 ===
 
 <a name="client.clock"></a>**clock** ( ) : Integer  
 
+Returns the offset corrected current time. If the offset has not been established a warning will be printed in the logs.
+
+Returns:
+- Integer
+
 ===
 
 <a name="client.connect"></a>**connect** (server, port) : Websocket Connection  
+
+Initiates a connection to the server. If no server and port parameters are provided it will grab them from the initial client config.
+
+Parameters:
+- server : String (optional)
+- port : Integer (optional)
+
+Returns:
+- Websocket Connection
 
 ===
 
 <a name="client.disconnect"></a>**disconnect** ( )  
 
+Closes the server connection.
+
 ===
 
-<a name="client.fireevent"></a>**fireEvent** (event, details)  
+<a name="client.fireevent"></a>**fireEvent** (event, details) : Client 
+
+Method to fire an event. Any prior registered event listeners will be executed.
+
+Parameters:
+- event : String
+- details : String / Object / Array
+
+Returns:
+- Client
 
 ===
 
 <a name="client.getclockoffset"></a>**getClockOffset** ( ) : Integer  
 
+Returns the time offset as estimated by the server
+
+Returns:
+- Integer
+
 ===
 
 <a name="client.getconnected"></a>**getConnected** ( ) : Boolean  
+
+Method to return the connection state. Returns true if connected, false if not.
+
+Returns:
+- Boolean
 
 ===
 
 <a name="client.getconnection"></a>**getConnection** ( ) : Websocket Connection  
 
+Method to return the current websocket connection.
+
+Returns:
+- Websocket Connection
+
 ===
 
 <a name="client.getid"></a>**getId** ( ) : UUID  
+
+Method to return the ID of the Client instance.
+
+Returns:
+- String
 
 ===
 
 <a name="client.getsyncprogress"></a>**getSyncProgress** ( ) : Float  
 
+Method to return the current time syncing progress. Note: alternatively one could use the 'syncprogress' event to receive regular updates on the sync progress.
+
+Returns:
+- Float
+
 ===
 
 <a name="client.issync"></a>**isSync** ( ) : Boolean  
+
+Method to return the sync state. Returns true if a sync has been established, false if not.
+
+Returns:
+- Boolean
 
 ===
 
 <a name="client.log"></a>**log** (arguments)  
 
+Convenience method to log console messages that will be honor the debug state as defined in the Client config.
+
 ===
 
 <a name="client.newmsg"></a>**newMsg** (type, body, callback, scope) : Message  
+
 Convenience method to create a new message object and automatically bind it to the client. Optionally it allows for attaching a callback method and scope.
 
 ```
@@ -105,17 +172,42 @@ Returns:
 
 <a name="client.now"></a>**now** ( ) : Integer  
 
+Convenience method to get the current time in milliseconds without offset. Note: use clock() to get the current time with offset correction.
+
+Returns:
+- Integer
+
 ===
 
-<a name="client.registerhandler"></a>**registerHandler** (name, fn)  
+<a name="client.registerhandler"></a>**registerHandler** (type, listener) : Client 
+
+Method to register event handlers. For a full list of supported events please see the Events section.
+
+Parameters:
+- type : String
+- listener : Function
+
+Returns:
+- Client
 
 ===
 
 <a name="client.removelistener"></a>**removeListener** (type, listener)  
 
+Removes a previously registere event listener
+
+Parameters:
+- type : String
+- listener : Function
+
 ===
 
 <a name="client.send"></a>**send** (msg)  
+
+Method to send a Message to the server. The 'msg' can be supplied as an instantiated Message object, a config object or JSON formatted string.
+
+Parameters:
+- msg : Message / Object / JSON
 
 ===
 
@@ -125,7 +217,7 @@ Returns:
 **bind** (client) : Message  
 Method to bind the message to the client. This is needed so it can be sent to the server thru the client.
 
-Properties:
+Parameters:
 - client (Client)
 
 Returns:
@@ -168,7 +260,7 @@ Returns:
 **setType** (type) : Message  
 Convenience method to set the type of the message object.
 
-Properties:
+Parameters:
 - type (String)
 
 Returns:
@@ -187,7 +279,7 @@ Returns:
 **setTs** (timestamp) : Message  
 Convenience method to set the dispatch timestamp of a message. The timestamp lives in the message head. This rarely needs to bet set directly though, as it is set as soon as the message is sent to the server, which is what you normally would want.
 
-Properties:
+Parameters:
 - timestamp (Integer)
 
 Returns:
@@ -203,7 +295,7 @@ Convenience method to get the body contents of a message object.
 **setBody** (body) : Message  
 Convenience method to directly set the body contents of a message object.
 
-Properties:
+Parameters:
 - body (String / Object / Array)
 
 Returns:
