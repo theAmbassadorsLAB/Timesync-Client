@@ -206,6 +206,9 @@ Convenience method to directly set the body contents of a message object.
 Properties:
 - body (String / Object / Array)
 
+Returns:
+- Message
+
 ===
 
 
