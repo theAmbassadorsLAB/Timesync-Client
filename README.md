@@ -2,7 +2,10 @@
 Javascript Client for the proprietary Ambassadors Timesync Server.
 
 
-**newMsg**(type, body, callback, scope) : Message  
+
+## TIMESYNC.Client ##
+
+**newMsg** (type, body, callback, scope) : Message  
 Convenience method to create a new message object and automatically bind it to the client. Optionally it allows for attaching a callback method and scope.
 
 ```
@@ -13,7 +16,8 @@ tsClient.newMsg('join_room',
   {roomId: 'test'},
   function(result) {
     console.debug(result);
-  }
+  },
+  this
 ).send()
 ```
 
@@ -26,3 +30,72 @@ Parameters:
 
 Returns:
  - Message object
+
+
+
+**getId** ( ) : UUID
+
+**getConnection** ( ) : Websocket Connection
+
+**getConnected** ( ) : Boolean
+
+**getClockOffset** ( ) : Integer
+
+**getSyncProgress** ( ) : Float
+
+**isSync** ( ) : Boolean
+
+**connect** (server, port) : Websocket Connection
+
+**disconnect** ( )
+
+**send** (msg)
+
+**clock** ( ) : Integer
+
+**now** ( ) : Integer
+
+**addListener** (type, listener)
+
+**fireEvent** (event, details)
+
+**removeListener** (type, listener)
+
+**registerHandler** (name, fn) : 
+
+**log** (arguments)
+
+
+## TIMESYNC.Message ##
+
+**bind** (client) : Message
+
+**getClient** ( ) : Client
+
+**send** ( ) : Message
+
+**validate** ( ) : Message
+
+**getType** ( ) : String
+
+**setType** (type) : Message
+
+**getTs** ( ) : Integer
+
+**setTs** (timestamp) : Message
+
+**getBody** ( ) : String / Object
+
+**setBody** (body) : Message
+
+
+
+## TIMESYNC.util ##
+
+**capitaliseString** (string) : String
+
+**formatTime** (milliseconds) : Integer
+
+**uuid4** ( ) : String
+
+**emptyFn** ( ) : Object
