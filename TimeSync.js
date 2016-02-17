@@ -390,6 +390,12 @@ TIMESYNC.Message = function (cfg) {
     if (typeof cfg === "string") { cfg = JSON.parse(cfg) || {}; }
 
     // ************************************************************************ 
+    // PRIVATE PROPERTIES
+    // ************************************************************************ 
+
+    var _client = undefined;
+
+    // ************************************************************************ 
     // PUBLIC PROPERTIES
     // ************************************************************************
 
@@ -399,28 +405,41 @@ TIMESYNC.Message = function (cfg) {
 
     // default to simple echo message type
     if (cfg.head.type === undefined) { cfg.head.type = "echo"; }
+
+    this.bind = function (client) {
+        // method to bind this message to a client, so we can call send or respond on the message itself.
+        // Note: the Client will bind any incoming messages by itself.
+
+        if (!client instanceof TIMESYNC.Client) { throw ("Message.bind expects a TIMESYNC.Client instance"); }
+
+        _client = client;
+        this.head.clientId = _client.getId();
+
+        return this;
+    }
+
+    this.getClient = function () {
+        return _client;
+    }
 };
 
 // ************************************************************************ 
 // PUBLIC METHODS
 // ************************************************************************ 
 
-TIMESYNC.Message.prototype.client = undefined;
+// TIMESYNC.Message.prototype.client = undefined;
 
-TIMESYNC.Message.prototype.bind = function (scope) {
-    // method to bind this message to a client, so we can call send or respond on the message itself.
-    // Note: the Client will bind any incoming messages by itself.
+// TIMESYNC.Message.prototype.bind = function (scope) {
+//     // method to bind this message to a client, so we can call send or respond on the message itself.
+//     // Note: the Client will bind any incoming messages by itself.
 
-    if (!scope instanceof TIMESYNC.Client) { throw ("Message.bind expects a TIMESYNC.Client instance"); }
+//     if (!scope instanceof TIMESYNC.Client) { throw ("Message.bind expects a TIMESYNC.Client instance"); }
 
-    // TODO: hide this.client in the prototype or private vars of Message,
-    // as it now gets encoded into JSON for every message we send to the server.
+//     this.prototype.client = scope;
+//     this.head.clientId = this.client.getId();
 
-    this.client = scope;
-    this.head.clientId = this.client.getId();
-
-    return this;
-};
+//     return this;
+// };
 
 TIMESYNC.Message.prototype.toString = function () {
     return JSON.stringify(this);
@@ -431,10 +450,10 @@ TIMESYNC.Message.prototype.toString = function () {
 
 TIMESYNC.Message.prototype.send = function () {
     if (this.validate()) {
-        var conn = this.client.getConnection();
+        var conn = this.getClient().getConnection();
 
         if (conn) {
-            if (this.getTs() === undefined) { this.setTs(this.client.clock()); }
+            if (this.getTs() === undefined) { this.setTs(this.getClient().clock()); }
             conn.send(this);
 
         } else {
@@ -446,7 +465,7 @@ TIMESYNC.Message.prototype.send = function () {
 };
 
 TIMESYNC.Message.prototype.validate = function () {
-    if (this.client === undefined || this.head.clientId === undefined) { throw ("Message has no Client. Please use Message.bind to bind it to a TIMESYNC.Client"); }
+    if (this.getClient() === undefined || this.head.clientId === undefined) { throw ("Message has no Client. Please use Message.bind to bind it to a TIMESYNC.Client"); }
     if (this.head.type === undefined) { throw ("Message type is undefined. Please use Message.setType to define a message type"); }
     return this;
 };
