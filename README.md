@@ -331,10 +331,21 @@ General utility methods.
 
 <a name="util.capitalisestring"></a>**capitaliseString** (string) : String  
 
+Method to promote the first character of a string to uppercase.
+
+Parameters:
+- string : String
+
+Returns:
+- String
+
 ===
 
 <a name="util.formattime"></a>**formatTime** (milliseconds) : String  
 Formats an integer as milliseconds into a time string like: hours:minutes:seconds:milliseconds  
+
+Parameters:
+- milliseconds : Integer
 
 Returns: 
 - String
