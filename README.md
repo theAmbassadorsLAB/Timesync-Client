@@ -304,7 +304,7 @@ Returns:
 ===
 
 <a name="client.removelistener"></a>**removeListener** (type, listener)  
-Removes a previously registere event listener
+Removes a previously registere event listener. For a list of events take a look at the [Events](#client.events) section.
 
 Parameters:
 - type : String
