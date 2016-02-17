@@ -147,6 +147,8 @@ TIMESYNC.Client = function (cfg) {
 
         this.listeners[type].push(listener);
         this.log("listener registered", type, listener);
+
+        return this;
     };
 
     this.fireEvent = function (event, details) {
@@ -180,6 +182,8 @@ TIMESYNC.Client = function (cfg) {
                 }
             }
         }
+
+        return this;
     };
 
     this.removeListener = function (type, listener) {
@@ -200,6 +204,8 @@ TIMESYNC.Client = function (cfg) {
 
             this.log("listener removed", type, listener);
         }
+
+        return this;
     };
 
     this.on = function () {
@@ -326,6 +332,7 @@ TIMESYNC.Client.prototype.onConnMessage = function (e) {
     }
 };
 
+// TODO: add a scope and allow multiple handlers to be registered under one event name!
 // method to register a custom handler
 TIMESYNC.Client.prototype.registerHandler = function (name, fn) {
     // input validation
@@ -341,6 +348,8 @@ TIMESYNC.Client.prototype.registerHandler = function (name, fn) {
     } else {
         throw ("handler with name '" + name + "' already exists");
     }
+
+    return this;
 };
 
 TIMESYNC.Client.prototype.log = function () {
