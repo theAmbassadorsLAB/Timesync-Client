@@ -15,6 +15,11 @@ Javascript Client for the Ambassadors Timesync Server.
 
 The Timesync Client is used to establish a websocket connection to the Timesync Server, which in turn initiates a series of ping requests to establish the time offset between the server and the client, regardless of network delay or instability. Once the server has reached confidence it has established the offset, it will notify the client and pass it the offset.  
 
+A development server is running on the following address:
+```
+ws://timesync.nl020.cube-cloud.com
+```
+
 The Client and Server communicate with eachother by sending Messages over the websocket connection. In general, Messages contain a unique id, a timestamp that gets set when dispatched, a message type and message body. The type is used to trigger specific behaviour on either end and the body contains any type of JSON serializable content. The Client can either register message handlers to act on incoming messages, or attach a callback and scope to outgoing messages.
 
 Apart from establishing an accurate sync, the server exposes several other features. It incorporates 'rooms' which can be created or joined. Rooms can also store arbitrary properties. This is great when you want to save application state onto the room, which then can be accessed by other clients when they join the room. State changes are always broadcasted to all users in the same room.
