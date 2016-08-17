@@ -1,11 +1,7 @@
 /*global WebSocket, TimeSync */
-/*jslint browser: true, nomen: true */
+/*jslint browser: true, nomen: true, stupid: true */
 
 "use strict";
-
-// TODO: server needs to secure the messages that get send. When sending a malformed pong message
-// the server will crash.
-// TODO: implement echo message type
 
 /** @Class TimeSync
  * Method to construct a TimeSync instance
@@ -43,10 +39,6 @@ TIMESYNC.Client = function (cfg) {
         // flag to indicate that we're connected to the server
         _connected = false,
 
-        // flag to indicate that we're given control by the server
-        // TODO: check if we still need this!
-        // _control = false,
-
         // holding the websocket connection
         _connection,
 
@@ -63,7 +55,7 @@ TIMESYNC.Client = function (cfg) {
     // PRIVILEGED METHODS 
     // ************************************************************************ 
 
-    this._setConnection = function (conn) { return _connection = conn; };
+    this._setConnection = function (conn) { _connection = conn; return _connection; };
 
     this._setConnected = function (state) { _connected = state === true; return this; };
 
@@ -77,16 +69,11 @@ TIMESYNC.Client = function (cfg) {
         return this;
     };
 
-    this.getId = function () { return _id = _id || TIMESYNC.util.uuid4(); };
+    this.getId = function () { _id = _id || TIMESYNC.util.uuid4(); return _id; };
 
     this.getConnection = function () { return _connection; };
 
     this.getConnected = function () { return _connected; };
-
-    // TODO: rename this, confusing
-    // this.getControl = function () { return _control; };
-
-    // this.setControl = function (state) { _control = state === true; return this; };
 
     this.getClockOffset = function () { return _clockOffset; };
 
@@ -379,7 +366,7 @@ TIMESYNC.Client.prototype.newMsg = function (type, body, callback, scope) {
     return msg;
 };
 
-TIMESYNC.Client.prototype.msgCallbacks = {}; 
+TIMESYNC.Client.prototype.msgCallbacks = {};
 
 /** @Class Message
  * TIMESYNC Message Class
@@ -402,7 +389,7 @@ TIMESYNC.Message = function (cfg) {
     // PRIVATE PROPERTIES
     // ************************************************************************ 
 
-    var _client = undefined;
+    var _client;
 
     // ************************************************************************ 
     // PUBLIC PROPERTIES
@@ -425,11 +412,11 @@ TIMESYNC.Message = function (cfg) {
         this.head.clientId = _client.getId();
 
         return this;
-    }
+    };
 
     this.getClient = function () {
         return _client;
-    }
+    };
 };
 
 // ************************************************************************ 
