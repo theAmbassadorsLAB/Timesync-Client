@@ -258,7 +258,7 @@ Returns:
 
 ===
 
-<a name="client.initSync"></a>**initSync** ( )  
+<a name="client.initsync"></a>**initSync** ( )  
 Method to initiate the sync process between the server and the client.
 
 Note: if the 'autoInitSync' config property is set to true (default) and a time offset has not previously been established, a time offset request will automatically be made on a succesfull server connection.
