@@ -79,6 +79,8 @@ TIMESYNC.Client = function (cfg) {
 
     this.getSyncProgress = function () { return _progress; };
 
+    this.initSync = function () { this.newMsg('request_time_offset').send(); };
+
     this.isSync = function () { return this.getSyncProgress() === 1; };
 
     // method to initialise a connection to the server
@@ -226,6 +228,7 @@ TIMESYNC.Client.prototype.init = function (cfg) {
     this.config.server = cfg.server || window.location.hostname;
     this.config.port = cfg.port || 8080;
     this.config.autoReconnect = cfg.autoReconnect || true;
+    this.config.autoInitSync = cfg.autoInitSync || true;
 
     // make sure our own uuid is set
     this.getId();
@@ -265,6 +268,11 @@ TIMESYNC.Client.prototype.onConnOpen = function () {
     this._setConnected(true);
 
     this.fireEvent("connected");
+
+    // initiate a sync request if we don't have a previous offset
+    if (this.config.autoInitSync && !this.isSync()) {
+        this.initSync();
+    }
 };
 
 TIMESYNC.Client.prototype.onConnError = function (e) {

@@ -39,9 +39,10 @@ Currently the following Server communication is supported:
 - [ping](#server.ping) _(private)_
 - [pong](#server.pong) _(private)_
 - [request_new_room](#server.request_new_room)
+- [request_time_offset](#server.request_time_offset)
 - [room_properties_changed](#server.room_properties_changed) _(private)_
 - [set_room_properties](#server.set_room_properties)
-- [userCount](#server.set_room_properties) _(private)_
+- [userCount](#server.userCount) _(private)_
 
 ===
 
@@ -108,6 +109,13 @@ Body:
 
 ===
 
+<a name="server.request_time_offset"></a>**request_time_offset** ( )  
+Request the server to initiate the sync process and estimate a time offset. This will initiate a series of ping request from the server to the client to estimate the clock offset. Once the estimation has been established the server will send a 'clockOffset' message and the client will fire a 'syncestablished' event.
+
+Note: if the 'autoInitSync' config property is set to true (default) and a time offset has not previously been established, a time offset request will automatically be made on a succesfull server connection.
+
+===
+
 <a name="server.room_properties_changed"></a>**room_properties_changed** ( ) : Object _(private)_  
 A Server initiated message to indicate that some or all room properties have changed.
 
@@ -130,9 +138,11 @@ Body:
 ===
 
 ### <a name="client.properties"></a>Properties:
-- debug : Boolean,  enable debug messages.
+- debug : Boolean, enable debug messages.
 - server : String, the server address to connect to.
-- port : Integer, the server port to connect on.
+- port : Integer (optional), the server port to connect on, defaults to 80.
+- autoReconnect : boolean (optional), automatically reconnect when the server connection is dropped, defaults to true.
+- autoInitSync : boolean (optional), automatically initiate a sync request to the server on a successful connection, defaults to true.
 
 ===
 
@@ -148,6 +158,7 @@ Body:
 - [getConnection](#client.getconnection)
 - [getId](#client.getid)
 - [getSyncProgress](#client.getsyncprogress)
+- [initSync](#client.initsync)
 - [isSync](#client.issync)
 - [log](#client.log)
 - [newMsg](#client.newmsg)
@@ -244,6 +255,13 @@ Method to return the current time syncing progress. Note: alternatively one coul
 
 Returns:
 - Float
+
+===
+
+<a name="client.initSync"></a>**initSync** ( )  
+Method to initiate the sync process between the server and the client.
+
+Note: if the 'autoInitSync' config property is set to true (default) and a time offset has not previously been established, a time offset request will automatically be made on a succesfull server connection.
 
 ===
 
