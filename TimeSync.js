@@ -272,7 +272,7 @@ TIMESYNC.Client.prototype.onConnError = function (e) {
     this._setConnected(false);
     // setUserCount(false);
 
-    this.fireEvent("connectionerror");
+    this.fireEvent("connectionerror", e);
 };
 
 TIMESYNC.Client.prototype.onConnClose = function () {
