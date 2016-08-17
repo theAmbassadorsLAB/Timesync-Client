@@ -270,7 +270,6 @@ TIMESYNC.Client.prototype.onConnOpen = function () {
 TIMESYNC.Client.prototype.onConnError = function (e) {
     this.log("error", "Connection error", e);
     this._setConnected(false);
-    // setUserCount(false);
 
     this.fireEvent("connectionerror", e);
 };
@@ -279,8 +278,6 @@ TIMESYNC.Client.prototype.onConnClose = function () {
     var me = this;
 
     this._setConnected(false);
-    // this.setControl(false);
-    // setUserCount(false);
 
     this.fireEvent("disconnected");
 
