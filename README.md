@@ -160,6 +160,7 @@ Body:
 - [getConnection](#client.getconnection)
 - [getId](#client.getid)
 - [getSyncProgress](#client.getsyncprogress)
+- [getStats](#client.getStats)
 - [initSync](#client.initsync)
 - [isSync](#client.issync)
 - [log](#client.log)
@@ -257,6 +258,15 @@ Method to return the current time syncing progress. Note: alternatively one coul
 
 Returns:
 - Float
+
+===
+
+
+<a name="client.getStats"></a>**getStats** ( ) : Object  
+Method to return a stats object holding general sync statistics.
+
+Returns:
+- Object
 
 ===
 

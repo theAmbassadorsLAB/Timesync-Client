@@ -79,7 +79,12 @@ TIMESYNC.Client = function (cfg) {
 
     this.getSyncProgress = function () { return _progress; };
 
-    this.initSync = function () { this.newMsg('request_time_offset').send(); };
+    this.initSync = function () {
+        this.newMsg('request_time_offset').send();
+
+        // update the stats
+        this._stats.ts1 = this.now();
+    };
 
     this.isSync = function () { return this.getSyncProgress() === 1; };
 
@@ -241,16 +246,31 @@ TIMESYNC.Client.prototype.init = function (cfg) {
             this._setSyncProgress(msg.body.progress);
         }
 
+        var ts = this.now();
+
         // send a pong back to the server with a time stamp in the body
         msg.setType("pong");
-        msg.setBody({ts: this.now()});
+        msg.setBody({ts: ts});
         msg.send();
+
+        console.log('ping', this);
+
+        // store the ping sample in stats
+        this._stats.samples.push({
+            id: this._stats.samples.length,
+            ts: Number(ts),
+            progress: this.getSyncProgress()
+        });
     });
 
     this.registerHandler("clockOffset", function (msg) {
         this._setClockOffset(msg.body.offset);
         this._setSyncProgress(1);
         this.fireEvent("syncestablished", msg.body.offset);
+
+        // update the stats
+        this._stats.ts2 = this.now();
+        this._stats.offset = msg.body.offset;
     });
 
     this.registerHandler("userCount", function (msg) {
@@ -373,7 +393,30 @@ TIMESYNC.Client.prototype.newMsg = function (type, body, callback, scope) {
     return msg;
 };
 
+TIMESYNC.Client.prototype._stats = {
+    samples: [],
+    ts1: 0,
+    ts2: 0,
+    offset: 0
+};
+
+TIMESYNC.Client.prototype.getStats = function () {
+    var total_sample_time = this._stats.samples.reduce(function (a, b, idx, list) {
+            return a + (b.ts - list[idx > 0 ? idx - 1 : 0].ts);
+        }, 0),
+        average_sample_time = total_sample_time / this._stats.samples.length;
+
+    return {
+        sync_start_time: this._stats.ts1,
+        sync_end_time: this._stats.ts2,
+        sync_duration: this._stats.ts2 - this._stats.ts1,
+        total_samples: this._stats.samples.length,
+        average_sample_time: average_sample_time
+    };
+};
+
 TIMESYNC.Client.prototype.msgCallbacks = {};
+
 
 /** @Class Message
  * TIMESYNC Message Class
