@@ -266,11 +266,12 @@ TIMESYNC.Client.prototype.init = function (cfg) {
     this.registerHandler("clockOffset", function (msg) {
         this._setClockOffset(msg.body.offset);
         this._setSyncProgress(1);
-        this.fireEvent("syncestablished", msg.body.offset);
 
         // update the stats
         this._stats.ts2 = this.now();
         this._stats.offset = msg.body.offset;
+
+        this.fireEvent("syncestablished", msg.body.offset);
     });
 
     this.registerHandler("userCount", function (msg) {
