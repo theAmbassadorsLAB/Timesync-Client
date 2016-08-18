@@ -226,7 +226,7 @@ TIMESYNC.Client.prototype.init = function (cfg) {
     // store config parameters
     this.config.debug = cfg.debug || false;
     this.config.server = cfg.server || window.location.hostname;
-    this.config.port = cfg.port || 8080;
+    this.config.port = cfg.port || 80;
     this.config.autoReconnect = cfg.autoReconnect === undefined ? true : cfg.autoReconnect;
     this.config.autoInitSync = cfg.autoInitSync === undefined ? true : cfg.autoInitSync;
 
