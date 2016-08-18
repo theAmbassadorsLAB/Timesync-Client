@@ -227,8 +227,8 @@ TIMESYNC.Client.prototype.init = function (cfg) {
     this.config.debug = cfg.debug || false;
     this.config.server = cfg.server || window.location.hostname;
     this.config.port = cfg.port || 8080;
-    this.config.autoReconnect = cfg.autoReconnect || true;
-    this.config.autoInitSync = cfg.autoInitSync || true;
+    this.config.autoReconnect = cfg.autoReconnect === undefined ? true : cfg.autoReconnect;
+    this.config.autoInitSync = cfg.autoInitSync === undefined ? true : cfg.autoInitSync;
 
     // make sure our own uuid is set
     this.getId();
