@@ -293,7 +293,7 @@ Convenience method to create a new message object and automatically bind it to t
 
 ```
 tsClient = new TIMESYNC.Client();
-tsClient.connect("live.theambassadors.nl", 8080);
+tsClient.connect("timesync.nl020.cube-cloud.com", 80);
 
 tsClient.newMsg('join_room',
   {roomId: 'test'},
