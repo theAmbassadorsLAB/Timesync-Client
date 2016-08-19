@@ -255,8 +255,6 @@ TIMESYNC.Client.prototype.init = function (cfg) {
         msg.setBody({ts: ts});
         msg.send();
 
-        console.log('ping', this);
-
         // store the ping sample in stats
         this._stats.samples.push({
             id: this._stats.samples.length,
@@ -410,6 +408,7 @@ TIMESYNC.Client.prototype.getStats = function () {
         average_sample_time = total_sample_time / this._stats.samples.length;
 
     return {
+        id: this.getId(),
         sync_start_time: this._stats.ts1,
         sync_end_time: this._stats.ts2,
         sync_duration: this._stats.ts2 - this._stats.ts1,
@@ -419,7 +418,6 @@ TIMESYNC.Client.prototype.getStats = function () {
 };
 
 TIMESYNC.Client.prototype.msgCallbacks = {};
-
 
 /** @Class Message
  * TIMESYNC Message Class
