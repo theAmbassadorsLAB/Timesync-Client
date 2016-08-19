@@ -314,7 +314,7 @@ TIMESYNC.Client.prototype.onConnClose = function () {
 
     if (this.config.autoReconnect) {
         setTimeout(function () {
-            console.log("autoReconnect is enabled, re-establishing connection");
+            this.log("autoReconnect is enabled, re-establishing connection");
             me.connect();
         }, 1000);
     }
