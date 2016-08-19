@@ -125,7 +125,9 @@ TIMESYNC.Client = function (cfg) {
 
     // return a timestamp with the corrected clock offset
     this.clock = function () {
-        if (this.getSyncProgress() < 1) { this.log("warn", "Clock syncing is still in progress. Clock value might be inacurate!"); }
+        var syncProgress = this.getSyncProgress();
+        if (syncProgress > 0 && syncProgress < 1) { this.log("warn", "Clock syncing is still in progress. Clock value might be inacurate!"); }
+
         return this.now() + parseFloat(this.getClockOffset());  // ms
     };
 
