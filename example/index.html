@@ -1,57 +1,109 @@
 <html>
 <head>
-    <title>Join the Beat</title>
+    <title>TimeSync Client</title>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no,maximum-scale=1">
-    
-    <!-- iPad retina icon -->
-    <link href="resources/img/apple-touch-icon-precomposed-152x152.png"
-          sizes="152x152"
-          rel="apple-touch-icon-precomposed">
-    
-    <!-- iPad retina icon (iOS < 7) -->
-    <link href="resources/img/apple-touch-icon-precomposed-144x144.png"
-          sizes="144x144"
-          rel="apple-touch-icon-precomposed">
-    
-    <!-- iPad non-retina icon -->
-    <link href="resources/img/apple-touch-icon-precomposed-76x76.png"
-          sizes="76x76"
-          rel="apple-touch-icon-precomposed">
-    
-    <!-- iPad non-retina icon (iOS < 7) -->
-    <link href="resources/img/apple-touch-icon-precomposed-72x72.png"
-          sizes="72x72"
-          rel="apple-touch-icon-precomposed">
-    
-    <!-- iPhone 6 Plus icon -->
-    <link href="resources/img/apple-touch-icon-precomposed-180x180.png"
-          sizes="120x120"
-          rel="apple-touch-icon-precomposed">
-    
-    <!-- iPhone retina icon (iOS < 7) -->
-    <link href="resources/img/apple-touch-icon-precomposed-114x114.png"
-          sizes="114x114"
-          rel="apple-touch-icon-precomposed">
-    
-    <!-- iPhone non-retina icon (iOS < 7) -->
-    <link href="resources/img/apple-touch-icon-precomposed-57x57.png"
-          sizes="57x57"
-          rel="apple-touch-icon-precomposed">
-
     <script src="../TimeSync.js"></script>
+
+    <style>
+        .container {
+            width: 300px;
+            height: 48px;
+            position: absolute;
+            top: -24px;
+            left: -150px;
+            margin-top: 40%;
+            margin-left: 50%
+        }
+
+        .progress {
+            font-family: helvetica;
+            font-size: 48px;
+            line-height: 48px;
+            font-weight: bold;
+        }
+
+        .status {
+            font-family: monospace;
+            white-space: pre;
+            font-size: 14px;
+            line-height: 14px;
+            font-weight: normal;
+            text-align: left;
+            margin-top: 12px;
+        }
+    </style>
 </head>
 <body>
-  <div id="progress"></div>
-  <script>
-    var tsClient = new TIMESYNC.Client({debug: true});
-    
-    tsClient.on("syncprogress", function (e) {
-      document.getElementById("progress").innerHTML = Math.floor(e.details * 100) + "%";
-    });
+    <div class="container">
+        <div id="progress" class="progress">0%</div>
+        <div id="status" class="status">Connecting</div>
+        <div id="timeoffset" class="status"></div>
+    </div>
 
-    tsClient.connect("live.theambassadors.nl", 8080);
+    <script>
+        var tsClient = new TIMESYNC.Client({debug: true}),
+            progressEl = document.getElementById("progress"),
+            statusEl = document.getElementById("status"),
+            timeoffsetEl = document.getElementById("timeoffset"),
+            clockOffset,
+            stats;
+        
+        // INIT EVENT LISTENERS
 
-  </script>
+        tsClient.on("connected", function (e) {
+            statusEl.innerHTML = "Connection Established";
+        });
+
+        tsClient.on("connectionerror", function (e) {
+            statusEl.innerHTML = "Connection Error Occured";
+        });
+
+        tsClient.on("disconnected", function (e) {
+            statusEl.innerHTML = "Connection Terminated";
+        });
+
+        tsClient.on("syncestablished", function (e) {
+            clockOffset = tsClient.getClockOffset();
+            stats = tsClient.getStats();
+            statusEl.innerHTML = "Sync Established";
+        });
+
+        tsClient.on("syncprogress", function (e) {
+            statusEl.innerHTML = "Syncing";
+            progressEl.innerHTML = Math.floor(e.details * 100) + "%";
+        });
+
+        // ESTABLISH A SERVER CONNECTION
+
+        tsClient.connect("timesync-dev.nl020.cube-cloud.com");
+
+        // DEMO METHODS
+
+        function showClock () {
+            if (clockOffset === undefined) {
+                timeoffsetEl.innerHTML = "Local Time:              " + formatTime(tsClient.now());
+            } else {
+                timeoffsetEl.innerHTML =
+                    "Local Time:              " + formatTime(tsClient.now()) +
+                    "<br>Synced Time:             " + formatTime(tsClient.clock()) +
+                    "<br>Clock Offset:            " + clockOffset + " ms" + 
+                    "<br>" +
+                    "<br>Sync Duration:           " + stats.sync_duration + " ms" +
+                    "<br>Total Samples:           " + stats.total_samples +
+                    "<br>Average Sample Duration: " + stats.average_sample_time + " ms";
+            }
+
+            requestAnimationFrame(showClock);
+        };
+
+        function formatTime (ms) {
+            var d = new Date(ms);
+            return d.toLocaleTimeString();
+        };
+
+        showClock();
+
+    </script>
 </body>
