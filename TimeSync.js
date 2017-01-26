@@ -1,17 +1,16 @@
-/*global WebSocket, TimeSync */
-/*jslint browser: true, nomen: true, stupid: true */
+/*global WebSocket, TimeSync, window, setTimeout, console */
 
 "use strict";
 
 /** @Class TimeSync
  * Method to construct a TimeSync instance
  * @param cfg {Object} config object
- * 
+ *
  * @event connected {Object} fires when the server connection is established
  * @event connectionerror {Object} fires when an error occures during connection
  * @event disconnected {Object} fires when the server connection is closed
  * @event syncprogress {Object} fires when the sync progress changes
- * 
+ *
  */
 
 // define the namespace
@@ -26,9 +25,9 @@ TIMESYNC.Client = function (cfg) {
 
     cfg = cfg || {};
 
-    // ************************************************************************ 
+    // ************************************************************************
     // PRIVATE PROPERTIES
-    // ************************************************************************ 
+    // ************************************************************************
 
     // the actual time difference between the server and the client (us)
     var _clockOffset = 0,
@@ -45,15 +44,15 @@ TIMESYNC.Client = function (cfg) {
         // holding the client uuid
         _id;
 
-    // ************************************************************************ 
+    // ************************************************************************
     // PUBLIC PROPERTIES
-    // ************************************************************************ 
+    // ************************************************************************
 
     this.config = {};
 
-    // ************************************************************************ 
-    // PRIVILEGED METHODS 
-    // ************************************************************************ 
+    // ************************************************************************
+    // PRIVILEGED METHODS
+    // ************************************************************************
 
     this._setConnection = function (conn) { _connection = conn; return _connection; };
 
@@ -89,21 +88,19 @@ TIMESYNC.Client = function (cfg) {
     this.isSync = function () { return this.getSyncProgress() === 1; };
 
     // method to initialise a connection to the server
-    this.connect = function (server, port) {
+    this.connect = function (server) {
         server = server || this.config.server;
-        port = port || this.config.port;
 
         // update the config
         this.config.server = server;
-        this.config.port = port;
 
         var me = this,
             conn;
 
-        this.log("Connecting", server, port);
+        this.log("Connecting", server);
 
         // create the websocket connection
-        conn = new WebSocket("wss://" + server + ":" + port, "echo-protocol");
+        conn = new WebSocket(server, "echo-protocol");
 
         // register connection response handlers
         conn.onmessage = function () { me.onConnMessage.apply(me, arguments); };
@@ -218,9 +215,9 @@ TIMESYNC.Client = function (cfg) {
     return this;
 };
 
-// ************************************************************************ 
+// ************************************************************************
 // PUBLIC METHODS
-// ************************************************************************ 
+// ************************************************************************
 
 // namespace to hold all message handlers
 TIMESYNC.Client.prototype.msgHandlers = {};
@@ -233,7 +230,6 @@ TIMESYNC.Client.prototype.init = function (cfg) {
     // store config parameters
     this.config.debug = cfg.debug || false;
     this.config.server = cfg.server || window.location.hostname;
-    this.config.port = cfg.port || 80;
     this.config.autoReconnect = cfg.autoReconnect === undefined ? true : cfg.autoReconnect;
     this.config.autoInitSync = cfg.autoInitSync === undefined ? true : cfg.autoInitSync;
 
@@ -429,20 +425,20 @@ TIMESYNC.Client.prototype.msgCallbacks = {};
  *          ts: (timestamp)
  *     },
  *     body: (optional)
- * 
+ *
  */
 TIMESYNC.Message = function (cfg) {
     if (cfg === undefined) { throw ("Message expects a cfg object or JSON string"); }
     if (cfg instanceof TIMESYNC.Message) { return cfg; }
     if (typeof cfg === "string") { cfg = JSON.parse(cfg) || {}; }
 
-    // ************************************************************************ 
+    // ************************************************************************
     // PRIVATE PROPERTIES
-    // ************************************************************************ 
+    // ************************************************************************
 
     var _client;
 
-    // ************************************************************************ 
+    // ************************************************************************
     // PUBLIC PROPERTIES
     // ************************************************************************
 
@@ -470,9 +466,9 @@ TIMESYNC.Message = function (cfg) {
     };
 };
 
-// ************************************************************************ 
+// ************************************************************************
 // PUBLIC METHODS
-// ************************************************************************ 
+// ************************************************************************
 
 // TIMESYNC.Message.prototype.client = undefined;
 
@@ -526,9 +522,9 @@ TIMESYNC.Message.prototype.setTs = function (ts) { this.head.ts = ts; return thi
 TIMESYNC.Message.prototype.getBody = function () { return this.body; };
 TIMESYNC.Message.prototype.setBody = function (body) { this.body = body; return this; };
 
-// ************************************************************************ 
-// HELPER FUNCTIONS 
-// ************************************************************************ 
+// ************************************************************************
+// HELPER FUNCTIONS
+// ************************************************************************
 
 TIMESYNC.util = {};
 
