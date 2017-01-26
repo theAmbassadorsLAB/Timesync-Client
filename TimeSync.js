@@ -103,7 +103,7 @@ TIMESYNC.Client = function (cfg) {
         this.log("Connecting", server, port);
 
         // create the websocket connection
-        conn = new WebSocket("ws://" + server + ":" + port, "echo-protocol");
+        conn = new WebSocket("wss://" + server + ":" + port, "echo-protocol");
 
         // register connection response handlers
         conn.onmessage = function () { me.onConnMessage.apply(me, arguments); };
