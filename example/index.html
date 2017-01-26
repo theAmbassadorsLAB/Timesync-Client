@@ -49,7 +49,7 @@
             timeoffsetEl = document.getElementById("timeoffset"),
             clockOffset,
             stats;
-        
+
         // INIT EVENT LISTENERS
 
         tsClient.on("connected", function (e) {
@@ -77,7 +77,7 @@
 
         // ESTABLISH A SERVER CONNECTION
 
-        tsClient.connect("timesync-dev.nl020.cube-cloud.com");
+        tsClient.connect("wss://nl020.cube-cloud.com/timesync");
 
         // DEMO METHODS
 
@@ -88,7 +88,7 @@
                 timeoffsetEl.innerHTML =
                     "Local Time:              " + formatTime(tsClient.now()) +
                     "<br>Synced Time:             " + formatTime(tsClient.clock()) +
-                    "<br>Clock Offset:            " + clockOffset + " ms" + 
+                    "<br>Clock Offset:            " + clockOffset + " ms" +
                     "<br>" +
                     "<br>Sync Duration:           " + stats.sync_duration + " ms" +
                     "<br>Total Samples:           " + stats.total_samples +
