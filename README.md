@@ -22,7 +22,7 @@ A development server is running on the following address:
 wss://nl020.cube-cloud.com/timesync
 ```
 
-The Client and Server communicate with eachother by sending Messages over the websocket connection. In general, Messages contain a unique id, a timestamp that gets set when dispatched, a message type and message body. The type is used to trigger specific behaviour on either end and the body contains any type of JSON serializable content. The Client can either register message handlers to act on incoming messages, or attach a callback and scope to outgoing messages.
+The Client and Server communicate with each other by sending Messages over the websocket connection. In general, Messages contain a unique id, a timestamp that gets set when dispatched, a message type and message body. The type is used to trigger specific behaviour on either end and the body contains any type of JSON serializable content. The Client can either register message handlers to act on incoming messages, or attach a callback and scope to outgoing messages.
 
 Apart from establishing an accurate sync, the server exposes several other features. It incorporates 'rooms' which can be created or joined. Rooms can also store arbitrary properties. This is great when you want to save application state onto the room, which then can be accessed by other clients when they join the room. State changes are always broadcasted to all users in the same room.
 
@@ -150,7 +150,6 @@ Response:
 ### <a name="client.properties"></a>Properties:
 - debug : Boolean, enable debug messages.
 - server : String, the server address to connect to.
-- port : Integer (optional), the server port to connect on, defaults to 80.
 - autoReconnect : boolean (optional), automatically reconnect when the server connection is dropped, defaults to true.
 - autoInitSync : boolean (optional), automatically initiate a sync request to the server on a successful connection, defaults to true.
 
@@ -200,12 +199,11 @@ Returns:
 
 ===
 
-<a name="client.connect"></a>**connect** (server, port) : Websocket Connection  
-Initiates a connection to the server. If no server and port parameters are provided it will grab them from the initial client config.
+<a name="client.connect"></a>**connect** (server) : Websocket Connection  
+Initiates a connection to the server. If no server parameter is provided it will grab it from the initial client config.
 
 Parameters:
 - server : String (optional)
-- port : Integer (optional)
 
 Returns:
 - Websocket Connection
@@ -565,7 +563,7 @@ Formats an integer as milliseconds into a time string like: hours:minutes:second
 Parameters:
 - milliseconds : Integer
 
-Returns: 
+Returns:
 - String
 
 ===
@@ -578,4 +576,3 @@ Returns:
 - String
 
 ===
-
