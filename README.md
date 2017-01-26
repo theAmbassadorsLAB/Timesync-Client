@@ -19,7 +19,7 @@ The Timesync Client is used to establish a websocket connection to the Timesync 
 
 A development server is running on the following address:
 ```
-ws://timesync.nl020.cube-cloud.com
+wss://timesync.nl020.cube-cloud.com
 ```
 
 The Client and Server communicate with eachother by sending Messages over the websocket connection. In general, Messages contain a unique id, a timestamp that gets set when dispatched, a message type and message body. The type is used to trigger specific behaviour on either end and the body contains any type of JSON serializable content. The Client can either register message handlers to act on incoming messages, or attach a callback and scope to outgoing messages.
