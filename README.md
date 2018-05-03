@@ -1,5 +1,5 @@
 # Timesync-Client
-Javascript Client for the Ambassadors Timesync Server.
+Javascript Client for the Ambassadors proprietary **Timesync Server**.
 
 ---
 
@@ -21,7 +21,7 @@ Javascript Client for the Ambassadors Timesync Server.
 
 ## <a name="client"></a>TIMESYNC.Client ##
 
-The **Timesync Client** is used to establish a websocket connection to the **Timesync Server**, which in turn initiates a series of ping requests to establish the time offset between the server and the client, regardless of network delay or instability. Once the server has reached confidence it has established the offset, it will notify the client and send it the offset.  
+The **Timesync Client** is used to establish a websocket connection to the **Timesync Server**, which in turn initiates a series of ping requests to establish the time offset between the server and the client, regardless of network delay or instability. Once the server has reached confidence it has established the offset, it will notify the client and send it the time offset in milliseconds.  
 
 A development server is running on the following address:
 ```
@@ -34,108 +34,288 @@ Apart from establishing an accurate sync, the server exposes several other featu
 
 The Server will act on a specific set of Message types as described below, but will broadcast any 'unknown' messages to all users of the same room. This is great to instantly push application state from any user to all other users. Think of a play / pause event, or game start event etc.
 
-Currently the following Server communication is supported:
+### Getting Started:
+
+For a full working example check /example/index.html.
+```javascript
+var tsClient = new TIMESYNC.Client({debug: true}),
+    clockOffset,
+    stats;
+
+// INIT EVENT LISTENERS
+
+tsClient.on("connected", function (e) {
+    console.log("Connection Established", e);
+
+    // register a message handler
+    tsClient.registerHandler("echo", function (msg) {
+        console.log("echo message received", msg);
+    });
+
+    // send an echo text message
+    tsClient.newMsg("echo", {test: "testing connection"}).send();
+
+    // join a room
+    tsClient.newMsg("join_room", {room: "dev_room"}).send();
+});
+
+tsClient.on("syncestablished", function (e) {
+    clockOffset = tsClient.getClockOffset();
+    stats = tsClient.getStats();
+    console.log("Sync Established", clockOffset, stats, e);
+});
+
+tsClient.on("syncprogress", function (e) {
+    console.log("syncing", Math.min(100, Math.round(e.details * 100));
+});
+
+// ESTABLISH A SERVER CONNECTION
+
+tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+
+```
+
+
+Currently the TimeSync Server uses the following reserved Message types for client / server communication:
 
 ### <a name="client.messages"></a>Messages:
 
-- [clear_room_properties](#server.clear_room_properties)
-- [clockOffset](#server.clockoffset) _(private, receive only)_
+- [claim_room](#server.claim_room)
+- [clockOffset](#server.clock_offset) _(private, receive only)_
+- [create_room](#server.create_room)
 - [echo](#server.echo)
 - [get_rooms](#server.get_rooms)
 - [get_room_properties](#server.get_room_properties)
+- [get_room_config](#server.get_room_config)
+- [get_users](#server.get_users)
 - [join_room](#server.join_room)
 - [leave_room](#server.leave_room)
 - [ping](#server.ping) _(private)_
 - [pong](#server.pong) _(private)_
-- [request_new_room](#server.request_new_room)
 - [request_time_offset](#server.request_time_offset)
 - [room_properties_changed](#server.room_properties_changed) _(private)_
 - [set_room_properties](#server.set_room_properties)
-- [userCount](#server.userCount) _(private)_
+- [set_room_config](#server.set_room_config)
+- [user_count](#server.user_count) _(private)_
+- [user_joined](#server.user_joined) _(private)_
+- [user_left](#server.user_left) _(private)_
 
 ---
-<a name="server.clear_room_properties"></a>**clear_room_properties** ( )   
-clear all the room properties. This will trigger a server response broadcasting the empty properties.
+<a name="server.claim_room"></a>type: **claim_room** : Object  
+Request to regain ownership of a room. This method requires the room private token that was previously issued by [create_room](#server.create_room). This method can be usefull in the case of a dropped connection on the side of the original owner. If no room is supplied, the server will assume we want to claim the currenlty joined room.
+
+Note: owning a room allows a client to update the room configuration. See [set_room_config](#server.set_room_config) for more information.
+
+Arguments: 
+- room : String (optional)
+- token : String
+
+Response:
+- success : Boolean
+- room : String
+
+```javascript
+var tsClient = new TIMESYNC.Client();
+tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+tsClient.newMsg("claim_room", {room: 'test', token: 'privatetoken'}, function (msg) { console.log(msg.success, msg.room); }).send();
+```
 
 ---
-<a name="server.clockoffset"></a>**clockOffset** ( ) : Integer _(private, receive only)_  
-A Server initiated message that gets sent as soon as the sync offset has been determined.
+<a name="server.clock_offset"></a>type: **clock_offset** : Integer _(private, receive only)_  
+Server dispatched message with the established time offset in milliseconds.  
 
 Response:
 - offset : Integer
 
 ---
-<a name="server.echo"></a>**echo** (...) : Anything JSON serializable  
-The echo message is a simple debug message type intended for testing server / client response. The server will simply bounce the message back to the client.
+<a name="server.create_room"></a>type: **create_room** (room, token) : String  
+Creates a new room on the server and joins it as an owner.  
+
+A room owner is able to set specific room configurations like the maximum amount of users, or wether the room should be listed in the [get_rooms](#server.get_rooms) command by making it private or not. See [set_room_config](#server.set_room_config) for more details. 
+
+If no `room` is supplied in the body, the room id will be generated by the server to ensure that it is unique.  
+
+If no `token` is supplied in the body, the server will generate a token which can be used to regain ownership of the room in the case of a lost connection by calling [claim_room](#server.claim_room) and passing the name of the room and the token in the body.  
+
+Additional room config parameters can be passed as well. See [set_room_config](#server.set_room_config) for more information.
+
+Use a callback or register a 'create_room' message handler before dispatching the message.
+
+Arguments:
+- room : String (optional)  
+- token : String (optional)
+- broadcast : Boolean (optional)
+- private : Boolean (optional)
+- maxUsers : Int (optional)
+- locked : Boolean (optional)
+
+Response:
+- room : String, the room ID
+- token : String, the room private token
+
+```javascript
+var tsClient = new TIMESYNC.Client();
+tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+tsClient.newMsg("create_room", {room: 'test', token: 'baddpassword'}, function (msg) { console.log(msg.room); }).send();
+```
 
 ---
-<a name="server.get_rooms"></a>**get_rooms** ( ) : Array  
+<a name="server.echo"></a>type: **echo** (...) : Anything JSON serializable  
+The echo message is a simple debug message type intended for testing server / client response. The server will simply bounce the message back to the client.
+```javascript
+var tsClient = new TIMESYNC.Client({debug: true});
+tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+tsClient.newMsg("echo", {test: "this is a test message"}).send();
+```
+
+---
+<a name="server.get_rooms"></a>type: **get_rooms** : Array  
 Requests a list of all available rooms. Use a callback or register a 'get_rooms' message handler before dispatching the message.
 
 Response:
-- rooms : Array
+- rooms : Array  
+
+```javascript
+var tsClient = new TIMESYNC.Client();
+tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+tsClient.newMsg("get_rooms", {}, function (msg) { console.log(msg.rooms); }).send();
+```
 
 ---
-<a name="server.get_room_properties"></a>**get_room_properties** ( ) : Object  
-Requests the current properties of the room. Use a callback or register a 'get_room_properties' message handler before dispatching the message. Note: the room properties are also included in the server response after successfully joining a room.
+<a name="server.get_room_properties"></a>type: **get_room_properties** : Object  
+Requests the properties of the current room. Use a callback or register a 'get_room_properties' message handler before dispatching the message.  
+Note: the room properties are also included in the server response after successfully joining a room.
 
 Response:
-- properties : Object
+- properties : Object  
+
+```javascript
+var tsClient = new TIMESYNC.Client();
+tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+tsClient.newMsg("get_room_properties", {}, function (msg) { console.log(msg.properties); }).send();
+```
 
 ---
-<a name="server.join_room"></a>**join_room** (room) : Boolean, String, Object  
-Requests to join a specific room. If the room does not exist, it will be created. Use a callback or register a 'join_room' message handler before dispatching the message.
+<a name="server.get_room_config"></a>type: **get_room_config** : Object  
+Requests the room configuration of the current room. Use a callback or register a 'get_room_config' message handler before dispatching the message.  
+Note: the room configuration is defined by the room owner. See [set_room_config](#server.set_room_config) for more details.
+
+Response:
+- broadcast: Boolean, custom type messages will be broadcasted to all users.
+- private: Boolean, private rooms will not be listed by the [get_rooms](#server.get_rooms) request.
+- maxUsers: Int, the maximum amount of users that can join this room.
+- locked: Boolean, locked rooms won't except any [join_room](#server.join_room) requests.
+
+```javascript
+var tsClient = new TIMESYNC.Client();
+tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+tsClient.newMsg("get_room_config", {}, function (msg) { console.log(msg); }).send();
+```
+
+---
+<a name="server.join_room"></a>type: **join_room** (room) : Boolean, String, Object  
+Requests to join a specific room. The server will return an error if the room does not exist. Use [get_rooms](#server.get_rooms) to choose an existing room or [create_room](#server.create_room) to make your own. Use a callback or register a 'join_room' message handler before dispatching the message. 
+
+Arguments:
+- room : String, the room ID
 
 Response:
 - success : Boolean
 - room : String
-- properties : Object
+- properties : Object  
+
+```javascript
+var tsClient = new TIMESYNC.Client();
+tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+tsClient.newMsg("join_room", {room: "test"}, function (msg) { console.log(msg); }).send();
+```
 
 ---
-<a name="server.leave_room"></a>**leave_room** ( ) : Boolean  
+<a name="server.leave_room"></a>type: **leave_room** : Boolean  
 Requests to leave the current room. Use a callback or register a 'leave_room' message handler before dispatching the message.
 
 Response:
-- success : Boolean
+- success : Boolean  
 
+```javascript
+var tsClient = new TIMESYNC.Client({debug: true});
+tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+tsClient.newMsg("leave_room").send();
+```
 ---
-<a name="server.ping"></a>**ping** ( ) _(private)_  
+<a name="server.ping"></a>type: **ping** _(private)_  
 Internal message type used for sync establishment, initiated by the Server.
 
 ---
-<a name="server.pong"></a>**pong** ( ) _(private)_  
+<a name="server.pong"></a>type: **pong** _(private)_  
 Internal message type used for sync establishment, responded by the Client.
 
 ---
-<a name="server.request_new_room"></a>**request_new_room** ( )  
-Request the server to create a new room and join it automatically. The room id will be generated by the server to ensure that it is unique. Use a callback or register a 'request_new_room' message handler before dispatching the message.
-
-Response:
-- room : room ID
-
----
-<a name="server.request_time_offset"></a>**request_time_offset** ( )  
+<a name="server.request_time_offset"></a>type: **request_time_offset**    
 Request the server to initiate the sync process and estimate a time offset. This will initiate a series of ping request from the server to the client to estimate the clock offset. Once the estimation has been established the server will send a 'clockOffset' message and the client will fire a `syncestablished` event.
 
 Note: if the 'autoInitSync' config property is set to true (default) and a time offset has not previously been established, a time offset request will automatically be made on a successful server connection.
 
+```javascript
+var tsClient = new TIMESYNC.Client();
+tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+tsClient.newMsg("request_time_offset").send();
+```
 ---
-<a name="server.room_properties_changed"></a>**room_properties_changed** ( ) : Object _(private, receive only)_  
-A Server initiated message to indicate that some or all room properties have changed.
-
+<a name="server.room_properties_changed"></a>type: **room_properties_changed** : Object _(private, receive only)_  
+A Server initiated message to indicate that some or all room properties have changed. Register a 'room_properties_changed' handler to catch this message.
 Response:
 - properties : Object
 
 ---
-<a name="server.set_room_properties"></a>**set_room_properties** (properties) : Boolean  
+<a name="server.set_room_properties"></a>type: **set_room_properties** (properties) : Boolean  
 Request the server to store or update the given properties onto the room.
 
+```javascript
+var tsClient = new TIMESYNC.Client({debug: true});
+tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+tsClient.newMsg("set_room_properties", {level: 1}).send();
+```
+
 ---
-<a name="server.userCount"></a>**userCount** ( ) : Integer _(private)_  
-A Server initiated message to notify the current user count. This gets triggered every time a user joins or leaves the room.
+<a name="server.set_room_config"></a>type: **set_room_config** (config) : Boolean  
+Request the server to update the given room configuration. Currently the following configuration options are supported:
+
+- broadcast: Boolean, custom type messages will be broadcasted to all users. Defaults to `true`.
+- private: Boolean, private rooms will not be listed by the [get_rooms](#server.get_rooms) request. Defaults to `false`.
+- maxUsers: Int, the maximum amount of users that can join this room. Defaults to `0` (unlimited).
+- locked: Boolean, locked rooms won't except any [join_room](#server.join_room) requests. Defaults to `false`.
+
+Note: only room owners can update the room configuration. Use [claim_room](#server.claim_room) to regain ownership of a room in the case of a lost server connection.
+
+```javascript
+var tsClient = new TIMESYNC.Client({debug: true});
+tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+tsClient.newMsg("set_room_properties", {level: 1}).send();
+```
+
+---
+<a name="server.user_count"></a>type: **user_count** : Integer _(private, receive only)_  
+A Server initiated message to notify the current user count. This gets triggered every time a user joins or leaves the room. Register a 'user_count' handler to catch this message.
 
 Response:
 - count : Integer
+
+---
+<a name="server.user_joined"></a>type: **user_joined** : String _(private, receive only)_  
+A Server initiated message to notify that a user has joined the room. Register a 'user_joined' handler to catch this message.  
+Note: this is currently only dispatched to room owners.  
+
+Response:
+- user : String
+
+---
+<a name="server.user_left"></a>type: **user_left** : String _(private, receive only)_  
+A Server initiated message to notify that a user has left the room. Register a 'user_left' handler to catch this message.  
+Note: this is currently only dispatched to room owners.  
+
+Response:
+- user : String
 
 ---
 ### <a name="client.properties"></a>Properties:
@@ -343,7 +523,7 @@ Parameters:
 <a name="events.connected"></a>**connected** ( )  
 Fires when the client has successfully initiated a server connection.
 
-==
+---
 
 <a name="events.connectionerror"></a>**connectionerror** (e)  
 Fires when the client has successfully initiated a server connection.
