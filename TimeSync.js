@@ -1,6 +1,5 @@
-/*global WebSocket, TimeSync, window, setTimeout, console */
-
-"use strict";
+/*eslint no-console: 0*/
+/*global WebSocket, window, setTimeout, console */
 
 /** @Class TimeSync
  * Method to construct a TimeSync instance
@@ -19,8 +18,8 @@ var TIMESYNC = TIMESYNC || {};
 TIMESYNC.Client = function (cfg) {
 
     // make sure websockets are available
-    if (!window.hasOwnProperty("WebSocket")) {
-        throw ("The TimeSync Client requires Websockets");
+    if (!window.hasOwnProperty('WebSocket')) {
+        throw ('The TimeSync Client requires Websockets');
     }
 
     cfg = cfg || {};
@@ -63,7 +62,7 @@ TIMESYNC.Client = function (cfg) {
     this._setSyncProgress = function (n) {
         if (_progress !== n) {
             _progress = n;
-            this.fireEvent("syncprogress", n);
+            this.fireEvent('syncprogress', n);
         }
         return this;
     };
@@ -97,10 +96,10 @@ TIMESYNC.Client = function (cfg) {
         var me = this,
             conn;
 
-        this.log("Connecting", server);
+        this.log('Connecting', server);
 
         // create the websocket connection
-        conn = new WebSocket(server, "echo-protocol");
+        conn = new WebSocket(server, 'echo-protocol');
 
         // register connection response handlers
         conn.onmessage = function () { me.onConnMessage.apply(me, arguments); };
@@ -123,7 +122,7 @@ TIMESYNC.Client = function (cfg) {
     // return a timestamp with the corrected clock offset
     this.clock = function () {
         var syncProgress = this.getSyncProgress();
-        if (syncProgress > 0 && syncProgress < 1) { this.log("warn", "Clock syncing is still in progress. Clock value might be inacurate!"); }
+        if (syncProgress > 0 && syncProgress < 1) { this.log('warn', 'Clock syncing is still in progress. Clock value might be inacurate!'); }
 
         return this.now() + parseFloat(this.getClockOffset());  // ms
     };
@@ -139,7 +138,7 @@ TIMESYNC.Client = function (cfg) {
         }
 
         this.listeners[type].push(listener);
-        this.log("listener registered", type, listener);
+        this.log('listener registered', type, listener);
 
         return this;
     };
@@ -149,7 +148,7 @@ TIMESYNC.Client = function (cfg) {
             len,
             listeners;
 
-        if (typeof event === "string") {
+        if (typeof event === 'string') {
             event = { type: event };
         }
 
@@ -162,7 +161,7 @@ TIMESYNC.Client = function (cfg) {
         }
 
         if (!event.type) {
-            throw new Error("Event object missing 'type' property");
+            throw new Error('Event object missing "type" property');
         }
 
         if (this.listeners[event.type] instanceof Array) {
@@ -195,7 +194,7 @@ TIMESYNC.Client = function (cfg) {
                 }
             }
 
-            this.log("listener removed", type, listener);
+            this.log('listener removed', type, listener);
         }
 
         return this;
@@ -237,7 +236,7 @@ TIMESYNC.Client.prototype.init = function (cfg) {
     this.getId();
 
     // register default message handlers
-    this.registerHandler("onPing", function (msg) {
+    this.registerHandler('onPing', function (msg) {
         // if the ping message contains a progress in the body we'll pull it out
         // and update the progress indicator
         if (msg.body && msg.body.progress) {
@@ -247,7 +246,7 @@ TIMESYNC.Client.prototype.init = function (cfg) {
         var ts = this.now();
 
         // send a pong back to the server with a time stamp in the body
-        msg.setType("pong");
+        msg.setType('pong');
         msg.setBody({ts: ts});
         msg.send();
 
@@ -259,7 +258,7 @@ TIMESYNC.Client.prototype.init = function (cfg) {
         });
     });
 
-    this.registerHandler("clockOffset", function (msg) {
+    this.registerHandler('clockOffset', function (msg) {
         this._setClockOffset(msg.body.offset);
         this._setSyncProgress(1);
 
@@ -267,24 +266,24 @@ TIMESYNC.Client.prototype.init = function (cfg) {
         this._stats.ts2 = this.now();
         this._stats.offset = msg.body.offset;
 
-        this.fireEvent("syncestablished", msg.body.offset);
+        this.fireEvent('syncestablished', msg.body.offset);
     });
 
-    this.registerHandler("userCount", function (msg) {
-        this.log("userCount", msg.body.count);
-        this.fireEvent("usercount", msg.body.count);
+    this.registerHandler('userCount', function (msg) {
+        this.log('userCount', msg.body.count);
+        this.fireEvent('usercount', msg.body.count);
     });
 
-    this.registerHandler("echo", function (msg) {
-        this.log("echo", msg.body);
+    this.registerHandler('echo', function (msg) {
+        this.log('echo', msg.body);
     });
 };
 
 TIMESYNC.Client.prototype.onConnOpen = function () {
-    this.log("Connection established");
+    this.log('Connection established');
     this._setConnected(true);
 
-    this.fireEvent("connected");
+    this.fireEvent('connected');
 
     // initiate a sync request if we don't have a previous offset
     if (this.config.autoInitSync && !this.isSync()) {
@@ -293,10 +292,10 @@ TIMESYNC.Client.prototype.onConnOpen = function () {
 };
 
 TIMESYNC.Client.prototype.onConnError = function (e) {
-    this.log("error", "Connection error", e);
+    this.log('error', 'Connection error', e);
     this._setConnected(false);
 
-    this.fireEvent("connectionerror", e);
+    this.fireEvent('connectionerror', e);
 };
 
 TIMESYNC.Client.prototype.onConnClose = function () {
@@ -304,11 +303,11 @@ TIMESYNC.Client.prototype.onConnClose = function () {
 
     this._setConnected(false);
 
-    this.fireEvent("disconnected");
+    this.fireEvent('disconnected');
 
     if (this.config.autoReconnect) {
         setTimeout(function () {
-            me.log("autoReconnect is enabled, re-establishing connection");
+            me.log('autoReconnect is enabled, re-establishing connection');
             me.connect();
         }, 1000);
     }
@@ -334,12 +333,12 @@ TIMESYNC.Client.prototype.onConnMessage = function (e) {
     // call the appropriate message handler
     // Note: Message handlers are defined as on[Message.head.type] camelcased.
     // eg: onPing, where type is 'ping'
-    handlerType = "on" + TIMESYNC.util.capitaliseString(msg.getType());
+    handlerType = 'on' + TIMESYNC.util.capitaliseString(msg.getType());
     if (this.msgHandlers.hasOwnProperty(handlerType)) {
         this.msgHandlers[handlerType].call(this, msg, this.getConnection());
 
     } else if (!callback) {
-        this.log("warn", "No handler registered for type '" + msg.head.type + "' with Message", msg);
+        this.log('warn', 'No handler registered for type "' + msg.head.type + '" with Message', msg);
     }
 };
 
@@ -347,17 +346,17 @@ TIMESYNC.Client.prototype.onConnMessage = function (e) {
 // method to register a custom handler
 TIMESYNC.Client.prototype.registerHandler = function (name, fn) {
     // input validation
-    if (typeof name !== "string") { this.log("error", "expecting first parameter to be a string"); }
-    if (typeof fn !== "function") { this.log("error", "expecting second paramter to be a function"); }
+    if (typeof name !== 'string') { this.log('error', 'expecting first parameter to be a string'); }
+    if (typeof fn !== 'function') { this.log('error', 'expecting second paramter to be a function'); }
 
     // normalize the name
-    if (name.indexOf("on") !== 0) { name = "on" + TIMESYNC.util.capitaliseString(name); }
+    if (name.indexOf('on') !== 0) { name = 'on' + TIMESYNC.util.capitaliseString(name); }
 
     if (!this.msgHandlers.hasOwnProperty(name)) {
         this.msgHandlers[name] = fn;
 
     } else {
-        throw ("handler with name '" + name + "' already exists");
+        throw ('handler with name "' + name + '" already exists');
     }
 
     return this;
@@ -366,9 +365,9 @@ TIMESYNC.Client.prototype.registerHandler = function (name, fn) {
 TIMESYNC.Client.prototype.log = function () {
     if (this.config.debug) {
         var args = [].slice.call(arguments),
-            level = "info";
+            level = 'info';
 
-        if (args.length > 0 && ["log", "info", "debug", "warn", "error"].indexOf(args[0]) >= 0) {
+        if (args.length > 0 && ['log', 'info', 'debug', 'warn', 'error'].indexOf(args[0]) >= 0) {
             level = args.shift();
         }
 
@@ -428,9 +427,9 @@ TIMESYNC.Client.prototype.msgCallbacks = {};
  *
  */
 TIMESYNC.Message = function (cfg) {
-    if (cfg === undefined) { throw ("Message expects a cfg object or JSON string"); }
+    if (cfg === undefined) { throw ('Message expects a cfg object or JSON string'); }
     if (cfg instanceof TIMESYNC.Message) { return cfg; }
-    if (typeof cfg === "string") { cfg = JSON.parse(cfg) || {}; }
+    if (typeof cfg === 'string') { cfg = JSON.parse(cfg) || {}; }
 
     // ************************************************************************
     // PRIVATE PROPERTIES
@@ -447,13 +446,13 @@ TIMESYNC.Message = function (cfg) {
     this.body = cfg.body || {};
 
     // default to simple echo message type
-    if (cfg.head.type === undefined) { cfg.head.type = "echo"; }
+    if (cfg.head.type === undefined) { cfg.head.type = 'echo'; }
 
     this.bind = function (client) {
         // method to bind this message to a client, so we can call send or respond on the message itself.
         // Note: the Client will bind any incoming messages by itself.
 
-        if (!client instanceof TIMESYNC.Client) { throw ("Message.bind expects a TIMESYNC.Client instance"); }
+        if (!client instanceof TIMESYNC.Client) { throw ('Message.bind expects a TIMESYNC.Client instance'); }
 
         _client = client;
         this.head.clientId = _client.getId();
@@ -500,7 +499,7 @@ TIMESYNC.Message.prototype.send = function () {
             conn.send(this);
 
         } else {
-            throw ("Client has no Connection available.");
+            throw ('Client has no Connection available.');
         }
     }
 
@@ -508,8 +507,8 @@ TIMESYNC.Message.prototype.send = function () {
 };
 
 TIMESYNC.Message.prototype.validate = function () {
-    if (this.getClient() === undefined || this.head.clientId === undefined) { throw ("Message has no Client. Please use Message.bind to bind it to a TIMESYNC.Client"); }
-    if (this.head.type === undefined) { throw ("Message type is undefined. Please use Message.setType to define a message type"); }
+    if (this.getClient() === undefined || this.head.clientId === undefined) { throw ('Message has no Client. Please use Message.bind to bind it to a TIMESYNC.Client'); }
+    if (this.head.type === undefined) { throw ('Message type is undefined. Please use Message.setType to define a message type'); }
     return this;
 };
 
@@ -540,7 +539,7 @@ TIMESYNC.util.formatTime = function (ms) {
         seconds = date.getSeconds(),
         milliseconds = date.getMilliseconds();
     date = null;
-    return hours + ':' + minutes + ':' + seconds + ":" + milliseconds;
+    return hours + ':' + minutes + ':' + seconds + ':' + milliseconds;
 };
 
 TIMESYNC.util.uuid4 = function () {
