@@ -258,7 +258,7 @@ TIMESYNC.Client.prototype.init = function (cfg) {
         });
     });
 
-    this.registerHandler('clockOffset', function (msg) {
+    this.registerHandler('clock_offset', function (msg) {
         this._setClockOffset(msg.body.offset);
         this._setSyncProgress(1);
 
@@ -269,7 +269,7 @@ TIMESYNC.Client.prototype.init = function (cfg) {
         this.fireEvent('syncestablished', msg.body.offset);
     });
 
-    this.registerHandler('userCount', function (msg) {
+    this.registerHandler('user_count', function (msg) {
         this.log('userCount', msg.body.count);
         this.fireEvent('usercount', msg.body.count);
     });
@@ -469,27 +469,12 @@ TIMESYNC.Message = function (cfg) {
 // PUBLIC METHODS
 // ************************************************************************
 
-// TIMESYNC.Message.prototype.client = undefined;
-
-// TIMESYNC.Message.prototype.bind = function (scope) {
-//     // method to bind this message to a client, so we can call send or respond on the message itself.
-//     // Note: the Client will bind any incoming messages by itself.
-
-//     if (!scope instanceof TIMESYNC.Client) { throw ("Message.bind expects a TIMESYNC.Client instance"); }
-
-//     this.prototype.client = scope;
-//     this.head.clientId = this.client.getId();
-
-//     return this;
-// };
-
 TIMESYNC.Message.prototype.toString = function () {
     return JSON.stringify(this);
 };
 
 // TODO: implement a callback registry so we don't have to create message handlers
 // for each message type that we send to the server, just to receive a response.
-
 TIMESYNC.Message.prototype.send = function () {
     if (this.validate()) {
         var conn = this.getClient().getConnection();
