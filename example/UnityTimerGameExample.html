@@ -60,11 +60,16 @@
         <input type="button" value="Join"   onclick="f_JoinRoom();" />
      
         <!-- control buttons -->
+        <div id="movementcontols" style = "display:none;">        
         <input type="button" value="up"     onclick="f_SendCustomMessage('W');" />
         <input type="button" value="down"   onclick="f_SendCustomMessage('S');" />
         <input type="button" value="left"   onclick="f_SendCustomMessage('D');" />
         <input type="button" value="right"  onclick="f_SendCustomMessage('A');" />
-        
+        </div>
+
+        <div id="timergamecontrols" style = "display:none;">
+        <input type="button" value="Press"  onclick="f_SendCustomMessage('Press');" />
+        </div>
     </div>
     <!--#endregion -->
 
@@ -106,7 +111,7 @@
                 //try to get the properties (if available)
                 if(msg.body.properties)
                 {
-                    f_CheckRecievedRoomProperties(msg.body.properties);
+                    f_CheckRecievedRoomProperties(msg);
                 }
                 else
                 {
@@ -117,24 +122,27 @@
             console.log("Message" , msg);
         }  
 
-        function f_CheckRecievedRoomProperties(properties)
+        function f_CheckRecievedRoomProperties(msg)
         {
-            if(properties.controlscheme)
+            switch(msg.body.properties["ControlScheme"])
             {
-                switch(controlscheme)
-                {
-                    case "scheme1":
-                    //switch the controls of this web client to something else. (display other div)
-                    break;
+                case "TimerGame":
+                document.getElementById("movementcontols").style.display = "none";
+                document.getElementById("timergamecontrols").style.display = "inline-block";
+                console.log("Recieved timergame controlscheme");
+                //switch the controls of this web client to something else. (display other div)
+                break;
 
-                    case "scheme1":
-                    //switch the controls of this web client to something else. (display other div)
-                    break;
+                case "MoveControls":
+                document.getElementById("movementcontols").style.display = "inline-block";
+                document.getElementById("timergamecontrols").style.display = "none";
+                console.log("Recieved usercontrol controlscheme");
+                //switch the controls of this web client to something else. (display other div)
+                break;
 
-                    default:
-                    console.log("Controlscheme not implemented") 
-                    break;
-                }
+                default:
+                console.log("Controlscheme not implemented") 
+                break;
             }
         }
         
