@@ -50,22 +50,27 @@
 <body>
     <!--#region divs  -->
     <div class="container">
+        
         <div id="progress" class="progress">0%</div>
         <div id="status" class="status">Connecting</div>
         <div id="timeoffset" class="status"></div>
+      
+        <!-- join room button field with standard fill-->      
+        Room to join: <input id = "joinRoomField" input type="text" value = "EVERYTHING" name="fname"><br>
+        <input type="button" value="Join"   onclick="f_JoinRoom();" />
+     
+        <!-- control buttons -->
+        <input type="button" value="up"     onclick="f_SendCustomMessage('W');" />
+        <input type="button" value="down"   onclick="f_SendCustomMessage('S');" />
+        <input type="button" value="left"   onclick="f_SendCustomMessage('D');" />
+        <input type="button" value="right"  onclick="f_SendCustomMessage('A');" />
         
-
-
-        <!-- join room button field with standard fill-->
-        <form action="/action_page.php">
-            RoomNameToJoin: <input id = "123" input type="text" value = "EVERYTHING" name="fname"><br>
-            <input id="clickMe" type="button" value="clickme" onclick="f_SendCustomMessage();" />
-        </form>
     </div>
     <!--#endregion -->
 
-    <!--#region scripts-->
+    <!--#region example scripts-->
     <script>
+        //define timeSyncClient
         var tsClient = new TIMESYNC.Client({debug: true}),
             progressEl = document.getElementById("progress"),
             statusEl = document.getElementById("status"),
@@ -73,24 +78,63 @@
             clockOffset,
             stats;
 
+        //register general handler messages.
+        tsClient.registerHandler("join_room",onGeneralCallBack);
         
-        //make functions
-        function doSomeThing()
-        {
-            alert("!");
-        }
-
-        function f_JoinRoom()
-        {
-            alert("Trying to join room...");
-        }     
-
-        function f_SendCustomMessage()
+        //@todo implement join room
+        function f_JoinRoom(room)
         {
             //get the value from the element.
-            var fieldVal = document.getElementById("123").value;
-            alert(fieldVal);
-        }   
+            var fieldVal = document.getElementById("joinRoomField").value;
+            tsClient.newMsg("join_room",{room : fieldVal}).send();
+
+            //get the properties (if available)
+        } 
+
+        function onRoomJoinCallBack(msg)
+        {
+            
+        }
+
+        //callbacks.
+        function onGeneralCallBack(msg)
+        {
+            if(msg.body.error)
+            {
+                console.log("ERROR" , msg.body.error);
+                return;
+            }
+
+            console.log("Message" , msg);
+        }
+        
+        function f_BroadcastMessage()
+        {
+            //@todo, sends messages.
+        }
+
+        function f_DirectMessage()
+        {
+            //@Todo add to: in body
+        }
+        
+        //@todo implement 
+        function f_SendCustomMessage(type)
+        {
+            alert(type);
+            //tsClient.send
+        }
+        
+        function onRoomPropertiesChange()
+        {
+            //get the room properties from body.
+
+            //if controltype1 
+                //show controltype 1
+            
+            // show controltype 2
+                //show contorltype 2
+        }
 
         tsClient.on("connected", function (e) {
             statusEl.innerHTML = "Connection Established";
@@ -114,13 +158,11 @@
             statusEl.innerHTML = "Syncing";
             progressEl.innerHTML = Math.floor(e.details * 100) + "%";
         });
-
         // ESTABLISH A SERVER CONNECTION
 
         tsClient.connect("wss://nl020.cube-cloud.com/timesync");
 
         // DEMO METHODS
-
         function showClock () {
             if (clockOffset === undefined) {
                 timeoffsetEl.innerHTML = "Local Time:              " + formatTime(tsClient.now());
@@ -144,7 +186,6 @@
         };
 
         showClock();
-
     </script>
     <!--#endregion-->
 </body>
