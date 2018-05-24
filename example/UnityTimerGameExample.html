@@ -1,0 +1,150 @@
+<html>
+<head>
+    <title>TimeSync Client</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no,maximum-scale=1">
+    <script src="../TimeSync.js"></script>
+
+    <style>
+        .container {
+            width: 300px;
+            height: 48px;
+            position: absolute;
+            top: -24px;
+            left: -150px;
+            margin-top: 40%;
+            margin-left: 50%
+        }
+
+        .progress {
+            font-family: helvetica;
+            font-size: 48px;
+            line-height: 48px;
+            font-weight: bold;
+        }
+
+        .status {
+            font-family: monospace;
+            white-space: pre;
+            font-size: 14px;
+            line-height: 14px;
+            font-weight: normal;
+            text-align: left;
+            margin-top: 12px;
+        }
+        
+        /*
+        .controlinput {
+            width: 300px;
+            height: 300px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+        }
+        */
+
+       
+    </style>
+</head>
+<body>
+    <!--#region divs  -->
+    <div class="container">
+        <div id="progress" class="progress">0%</div>
+        <div id="status" class="status">Connecting</div>
+        <div id="timeoffset" class="status"></div>
+        
+
+
+        <!-- join room button field with standard fill-->
+        <form action="/action_page.php">
+            RoomNameToJoin: <input id = "123" input type="text" value = "EVERYTHING" name="fname"><br>
+            <input id="clickMe" type="button" value="clickme" onclick="f_SendCustomMessage();" />
+        </form>
+    </div>
+    <!--#endregion -->
+
+    <!--#region scripts-->
+    <script>
+        var tsClient = new TIMESYNC.Client({debug: true}),
+            progressEl = document.getElementById("progress"),
+            statusEl = document.getElementById("status"),
+            timeoffsetEl = document.getElementById("timeoffset"),
+            clockOffset,
+            stats;
+
+        
+        //make functions
+        function doSomeThing()
+        {
+            alert("!");
+        }
+
+        function f_JoinRoom()
+        {
+            alert("Trying to join room...");
+        }     
+
+        function f_SendCustomMessage()
+        {
+            //get the value from the element.
+            var fieldVal = document.getElementById("123").value;
+            alert(fieldVal);
+        }   
+
+        tsClient.on("connected", function (e) {
+            statusEl.innerHTML = "Connection Established";
+        });
+
+        tsClient.on("connectionerror", function (e) {
+            statusEl.innerHTML = "Connection Error Occured";
+        });
+
+        tsClient.on("disconnected", function (e) {
+            statusEl.innerHTML = "Connection Terminated";
+        });
+
+        tsClient.on("syncestablished", function (e) {
+            clockOffset = tsClient.getClockOffset();
+            stats = tsClient.getStats();
+            statusEl.innerHTML = "Sync Established";
+        });
+
+        tsClient.on("syncprogress", function (e) {
+            statusEl.innerHTML = "Syncing";
+            progressEl.innerHTML = Math.floor(e.details * 100) + "%";
+        });
+
+        // ESTABLISH A SERVER CONNECTION
+
+        tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+
+        // DEMO METHODS
+
+        function showClock () {
+            if (clockOffset === undefined) {
+                timeoffsetEl.innerHTML = "Local Time:              " + formatTime(tsClient.now());
+            } else {
+                timeoffsetEl.innerHTML =
+                    "Local Time:              " + formatTime(tsClient.now()) +
+                    "<br>Synced Time:             " + formatTime(tsClient.clock()) +
+                    "<br>Clock Offset:            " + clockOffset + " ms" +
+                    "<br>" +
+                    "<br>Sync Duration:           " + stats.sync_duration + " ms" +
+                    "<br>Total Samples:           " + stats.total_samples +
+                    "<br>Average Sample Duration: " + stats.average_sample_time + " ms";
+            }
+
+            requestAnimationFrame(showClock);
+        };
+
+        function formatTime (ms) {
+            var d = new Date(ms);
+            return d.toLocaleTimeString();
+        };
+
+        showClock();
+
+    </script>
+    <!--#endregion-->
+</body>
