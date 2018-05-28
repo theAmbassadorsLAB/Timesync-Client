@@ -63,8 +63,8 @@
         <div id="movementcontols" style = "display:none;">        
         <input type="button" value="up"     onclick="f_SendCustomMessage('W');" />
         <input type="button" value="down"   onclick="f_SendCustomMessage('S');" />
-        <input type="button" value="left"   onclick="f_SendCustomMessage('D');" />
-        <input type="button" value="right"  onclick="f_SendCustomMessage('A');" />
+        <input type="button" value="left"   onclick="f_SendCustomMessage('A');" />
+        <input type="button" value="right"  onclick="f_SendCustomMessage('D');" />
         </div>
 
         <div id="timergamecontrols" style = "display:none;">
@@ -90,7 +90,7 @@
         
         
         //sends a message with join_room and the desired room to join in the field.
-        function f_JoinRoom(room)
+        function f_JoinRoom()
         {
             //get the value from the join room field.
             var fieldVal = document.getElementById("joinRoomField").value;
@@ -104,6 +104,9 @@
             {
                 //log the error message of the body.
                 console.log("ERROR" , msg.body.error);
+                console.log("Waiting for host, trying join in 5 seconds");
+                //try again in 5 seconds.
+                setTimeout(function(){ f_JoinRoom(); }, 3000);
                 return;
             }
             else
@@ -187,8 +190,9 @@
         //@todo implement 
         function f_SendCustomMessage(type)
         {
+            tsClient.newMsg(type).send();
             //same logic as join room with fields.
-            alert(type);
+            //alert(type);
             //tsClient.send
         }
         
@@ -231,7 +235,7 @@
         tsClient.connect("wss://nl020.cube-cloud.com/timesync");
 
         //local connection (for testing)
-        tsClient.connect("ws://localhost:8080");
+        //tsClient.connect("ws://localhost:8080");
 
         // DEMO METHODS
         function showClock () {
