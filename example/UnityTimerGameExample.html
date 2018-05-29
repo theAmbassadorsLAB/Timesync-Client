@@ -20,8 +20,7 @@
         }
 
          .roombuttonsContainer {
-            margin-top: 4ex;
-            outline: 2px solid black;
+            outline: 3px solid black;
         }
 
         .gamecontrol {
@@ -40,7 +39,7 @@
         .gamecontrolscontainerleft
         {
             top: 50%;
-            left: 0;
+            left: 3;
             transform: translate(0, -50%);
         }
 
@@ -54,20 +53,20 @@
         .gamecontrolscontainerright
         {
             top: 50%;
-            right: 0;
+            right: 3;
             transform: translate(0, -50%);
         }
 
         .gamecontrolscontainerbottom
         {
-            bottom: 0;
+            bottom: 3;
             right: 50%;
             transform: translate(50%, 0);
         }
 
         .gamecontrolscontainertop
         {
-            top: 0;
+            top: 3;
             right: 50%;
             transform: translate(50%, 0);
         }
@@ -102,16 +101,24 @@
 
     <div class="wrapper">
         <div class="gameControlContainer" >
-            <div id = "movementcontrols" style = "display:inline-block">
+            <div id = "movementcontrols" style = "display:none">
             <button class="gamecontrol gamecontrolscontainerleft"   onclick="f_SendCustomMessage('A')"> left  </button>
             <button class="gamecontrol gamecontrolscontainerbottom" onclick="f_SendCustomMessage('S')"> down </button>
             <button class="gamecontrol gamecontrolscontainerright"  onclick="f_SendCustomMessage('D')"> right </button>
             <button class="gamecontrol gamecontrolscontainertop"    onclick="f_SendCustomMessage('W')"> up </button>            
             </div>
 
-            <div id = "timergamecontrols" style = "display:inline-block">
+            <div id = "timergamecontrols" style = "display:none">
             <button class="gamecontrol gamecontrolscontainermiddle" onclick="f_SendCustomMessage('PRESSED')">Press</button>
             </div>
+        </div>
+
+        <div class="container">
+                <!-- join room button field with standard fill-->      
+                <input type="button" id="joinroombutton" value="Join Room          "   onclick="f_JoinRoom();" /> <input id = "joinRoomField" input type="text" value = "EVERYTHING" name="fname"><br>        
+                <input type="button" id="leaveroombutton" style = "display:none" value="Leave Room          "   onclick="f_LeaveRoom();" /> 
+                <input type="button" value="Private Message"   onclick="f_DirectMessage('Direct',{'One' : 'Two'});" />
+                <input id = "sendDirectMessageField" input type="text" value = "xxxxxxxx-xxxx-xxxx-xxxx-xxGAMEMASTER" name="fname"><br>
         </div>
         
         <!--#region divs  -->
@@ -120,13 +127,10 @@
             <div id="progress" class="progress">0%</div>
             <div id="status" class="status">Connecting</div>
             <div id="timeoffset" class="status"></div>
-            <div id="userID" class = "status"> </div>
-
-            <!-- join room button field with standard fill-->      
-            <input type="button" value="Join Room          "   onclick="f_JoinRoom();" /> <input id = "joinRoomField" input type="text" value = "EVERYTHING" name="fname"><br>        
-            <input type="button" value="Private Message"   onclick="f_DirectMessage('Direct',{'One' : 'Two'});" />
-            <input id = "sendDirectMessageField" input type="text" value = "xxxxxxxx-xxxx-xxxx-xxxx-xxGAMEMASTER" name="fname"><br>
+            <div id="userID" class = "status"> </div>           
         </div>
+
+        
     </div>
 
 
@@ -144,22 +148,38 @@
             stats;
 
         //register general handler messages.
+        tsClient.registerHandler("leave_room",onLeaveRoom);
         tsClient.registerHandler("join_room",onRoomJoin);
         tsClient.registerHandler("chat",onChatRecieved);
         tsClient.registerHandler("room_properties_changed",f_CheckRecievedRoomProperties);
         
+        //register common control that should not have to be handled in any way
+        tsClient.registerHandler("W",empty);
+        tsClient.registerHandler("A",empty);
+        tsClient.registerHandler("S",empty);
+        tsClient.registerHandler("D",empty);
+        tsClient.registerHandler("PRESSED",empty);
+        
+        //function that is triggered when any known input should be ignored by the console.
+        function empty(){}
         
         //sends a message with join_room and the desired room to join in the field.
         function f_JoinRoom()
         {
+            console.log("Joining room...")
             //get the value from the join room field.
             var fieldVal = document.getElementById("joinRoomField").value;
             //send the message
             tsClient.newMsg("join_room",{room : fieldVal}).send();
-        }       
+        }
+        
+        function f_LeaveRoom()
+        {
+            tsClient.newMsg("leave_room").send();
+        }
 
         function onRoomJoin(msg)
-        {            
+        {             
             if(msg.body.error)
             {
                 console.log("Waiting for host, trying to join room again in 5 seconds...");
@@ -167,7 +187,11 @@
                 return;
             }
             else
-            {
+            {          
+                console.log("Hello");        
+                document.getElementById("joinroombutton").style.display = "none";
+                document.getElementById("leaveroombutton").style.display = "inline-block";
+
                 //try to get the properties (if available)
                 if(msg.body.properties)
                 {
@@ -181,6 +205,12 @@
 
             console.log("Message" , msg);
         }  
+
+        function onLeaveRoom()
+        {
+            document.getElementById("leaveroombutton").style.display = "none";
+            document.getElementById("joinroombutton").style.display = "inline-block";
+        }
 
         function f_CheckRecievedRoomProperties(msg)
         {
@@ -252,8 +282,9 @@
         }
 
         //register for events that fire from TimeSync.js
-        tsClient.on("connected", function (e) {
+        tsClient.on("connected", function (e) {           
             statusEl.innerHTML = "Connection Established";
+            f_JoinRoom();
         });
 
         tsClient.on("connectionerror", function (e) {
@@ -277,6 +308,8 @@
 
         // ESTABLISH A SERVER CONNECTION
         tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+
+        
 
         //tsClient.connect("wss://timesync.cube-cloud.com/timesync");
 
