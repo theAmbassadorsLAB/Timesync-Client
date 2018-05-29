@@ -26,7 +26,7 @@ Please run it in the editor and refresh this page.
 
         .roombuttonsContainer 
         {
-            outline: 3px solid black;
+            outline: 2px solid black;
         }        
         
         .gamecontrolButton
@@ -180,10 +180,10 @@ Please run it in the editor and refresh this page.
         }
 
         //Sends a message and fills the to: field, thus sending it directly to the user.
-        function f_DirectMessage(type,body,to)
+        function f_DirectMessage(type,body)
         {
-            var fieldVal = document.getElementById("sendDirectMessageField").value;
-            tsClient.directMsg(type,body, fieldVal).send();
+            var to = document.getElementById("sendDirectMessageField").value;
+            tsClient.directMsg(type,to,body).send();
         }
 
         //sends a message with a given type and body.

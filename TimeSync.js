@@ -375,30 +375,27 @@ TIMESYNC.Client.prototype.log = function () {
     }
 };
 
-
 //newMsg function but with a 'to' in the head
-TIMESYNC.Client.prototype.directMsg = function (type, body, to, callback, scope) {
+TIMESYNC.Client.prototype.directMsg = function (type, to, body, callback, scope) {
     type = type || 'echo';
     body = body || '';
 
-    if(to)
-    {
-        var msg = new TIMESYNC.Message({head: {type: type, to: to}, body: body}).bind(this);
-    }
-    else
-    {
-        var msg = new TIMESYNC.Message({head: {type: type}, body: body}).bind(this);
+    if(!to)
+    {        
+        console.log("directMsg requires a to value");
+        return;
     }    
 
+    var msg = new TIMESYNC.Message({head: {type: type, to: to}, body: body}).bind(this);
+
     // register the callback
-    if (callback) {
+    if (callback) 
+    {
         this.msgCallbacks[msg.id] = {fn: callback, scope: scope};
     }
 
     return msg;
 };
-
-
 
 TIMESYNC.Client.prototype.newMsg = function (type, body, callback, scope) {
     type = type || 'echo';
