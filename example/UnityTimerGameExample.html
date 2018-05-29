@@ -7,14 +7,77 @@
     <script src="../TimeSync.js"></script>
 
     <style>
+        .wrapper {
+            display: flex;
+            flex-flow: column nowrap;
+            outline: 2px solid black;
+            max-width: 80ex;
+            margin: auto;
+        }
+
         .container {
-            width: 300px;
-            height: 48px;
+            outline: 2px solid black;
+        }
+
+         .roombuttonsContainer {
+            margin-top: 4ex;
+            outline: 2px solid black;
+        }
+
+        .gamecontrol {
+            background: gray;
+            width: 4rem;
+            height: 4rem;
             position: absolute;
-            top: -24px;
-            left: -150px;
-            margin-top: 40%;
-            margin-left: 50%
+        }
+     
+        .gameControlContainer
+        {            
+            height: 35rem;
+            position: relative;
+        }
+
+        .gamecontrolscontainerleft
+        {
+            top: 50%;
+            left: 0;
+            transform: translate(0, -50%);
+        }
+
+         .gamecontrolscontainermiddle
+        {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .gamecontrolscontainerright
+        {
+            top: 50%;
+            right: 0;
+            transform: translate(0, -50%);
+        }
+
+        .gamecontrolscontainerbottom
+        {
+            bottom: 0;
+            right: 50%;
+            transform: translate(50%, 0);
+        }
+
+        .gamecontrolscontainertop
+        {
+            top: 0;
+            right: 50%;
+            transform: translate(50%, 0);
+        }
+
+        .othercontainer
+        {         
+            height: 10em;            
+            display: flex;
+            align-items: center;
+            justify-content: center            
         }
 
         .progress {
@@ -32,45 +95,42 @@
             font-weight: normal;
             text-align: left;
             margin-top: 12px;
-        }
-        
-        /*
-        .controlinput {
-            width: 300px;
-            height: 300px;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-        }
-        */
-
-       
+        }       
     </style>
 </head>
-<body>
-    <!--#region divs  -->
-    <div class="container">
-        
-        <div id="progress" class="progress">0%</div>
-        <div id="status" class="status">Connecting</div>
-        <div id="timeoffset" class="status"></div>
-      
-        <!-- join room button field with standard fill-->      
-        Room to join: <input id = "joinRoomField" input type="text" value = "EVERYTHING" name="fname"><br>
-        <input type="button" value="Join"   onclick="f_JoinRoom();" />
-     
-        <!-- control buttons -->
-        <div id="movementcontols" style = "display:none;">        
-        <input type="button" value="up"     onclick="f_SendCustomMessage('W');" />
-        <input type="button" value="down"   onclick="f_SendCustomMessage('S');" />
-        <input type="button" value="left"   onclick="f_SendCustomMessage('A');" />
-        <input type="button" value="right"  onclick="f_SendCustomMessage('D');" />
-        </div>
+<body>  `
 
-        <div id="timergamecontrols" style = "display:none;">
-        <input type="button" value="Press"  onclick="f_SendCustomMessage('Press');" />
+    <div class="wrapper">
+        <div class="gameControlContainer" >
+            <div id = "movementcontrols" style = "display:inline-block">
+            <button class="gamecontrol gamecontrolscontainerleft"   onclick="f_SendCustomMessage('A')"> left  </button>
+            <button class="gamecontrol gamecontrolscontainerbottom" onclick="f_SendCustomMessage('S')"> down </button>
+            <button class="gamecontrol gamecontrolscontainerright"  onclick="f_SendCustomMessage('D')"> right </button>
+            <button class="gamecontrol gamecontrolscontainertop"    onclick="f_SendCustomMessage('W')"> up </button>            
+            </div>
+
+            <div id = "timergamecontrols" style = "display:inline-block">
+            <button class="gamecontrol gamecontrolscontainermiddle" onclick="f_SendCustomMessage('PRESSED')">Press</button>
+            </div>
+        </div>
+        
+        <!--#region divs  -->
+        <div class="container">
+            
+            <div id="progress" class="progress">0%</div>
+            <div id="status" class="status">Connecting</div>
+            <div id="timeoffset" class="status"></div>
+            <div id="userID" class = "status"> </div>
+
+            <!-- join room button field with standard fill-->      
+            <input type="button" value="Join Room          "   onclick="f_JoinRoom();" /> <input id = "joinRoomField" input type="text" value = "EVERYTHING" name="fname"><br>        
+            <input type="button" value="Private Message"   onclick="f_DirectMessage('Direct',{'One' : 'Two'});" />
+            <input id = "sendDirectMessageField" input type="text" value = "xxxxxxxx-xxxx-xxxx-xxxx-xxGAMEMASTER" name="fname"><br>
         </div>
     </div>
+
+
+    
     <!--#endregion -->
 
     <!--#region example scripts-->
@@ -102,11 +162,8 @@
         {            
             if(msg.body.error)
             {
-                //log the error message of the body.
-                console.log("ERROR" , msg.body.error);
-                console.log("Waiting for host, trying join in 5 seconds");
-                //try again in 5 seconds.
-                setTimeout(function(){ f_JoinRoom(); }, 3000);
+                console.log("Waiting for host, trying to join room again in 5 seconds...");
+                setTimeout(function(){ f_JoinRoom(); }, 5000);
                 return;
             }
             else
@@ -127,17 +184,18 @@
 
         function f_CheckRecievedRoomProperties(msg)
         {
+            console.log(msg);
             switch(msg.body.properties["ControlScheme"])
             {
                 case "TimerGame":
-                document.getElementById("movementcontols").style.display = "none";
+                document.getElementById("movementcontrols").style.display = "none";
                 document.getElementById("timergamecontrols").style.display = "inline-block";
                 console.log("Recieved timergame controlscheme");
                 //switch the controls of this web client to something else. (display other div)
                 break;
 
                 case "MoveControls":
-                document.getElementById("movementcontols").style.display = "inline-block";
+                document.getElementById("movementcontrols").style.display = "inline-block";
                 document.getElementById("timergamecontrols").style.display = "none";
                 console.log("Recieved usercontrol controlscheme");
                 //switch the controls of this web client to something else. (display other div)
@@ -181,30 +239,16 @@
         }
 
         // @todo implement.
-        function f_DirectMessage()
+        function f_DirectMessage(type,body,to)
         {
-            //@Todo add to: in body
-            //same logic as join room with fields.
+            var fieldVal = document.getElementById("sendDirectMessageField").value;
+            tsClient.directMsg(type,body, fieldVal).send();
         }
         
         //@todo implement 
         function f_SendCustomMessage(type)
         {
             tsClient.newMsg(type).send();
-            //same logic as join room with fields.
-            //alert(type);
-            //tsClient.send
-        }
-        
-        function onRoomPropertiesChange()
-        {
-            //get the room properties from body.
-
-            //if controltype1 
-                //show controltype 1
-            
-            // show controltype 2
-                //show contorltype 2
         }
 
         //register for events that fire from TimeSync.js
@@ -234,6 +278,8 @@
         // ESTABLISH A SERVER CONNECTION
         tsClient.connect("wss://nl020.cube-cloud.com/timesync");
 
+        //tsClient.connect("wss://timesync.cube-cloud.com/timesync");
+
         //local connection (for testing)
         //tsClient.connect("ws://localhost:8080");
 
@@ -249,7 +295,8 @@
                     "<br>" +
                     "<br>Sync Duration:           " + stats.sync_duration + " ms" +
                     "<br>Total Samples:           " + stats.total_samples +
-                    "<br>Average Sample Duration: " + stats.average_sample_time + " ms";
+                    "<br>Average Sample Duration: " + stats.average_sample_time + " ms" +
+                    "<br>UUID:                    " + tsClient.getId();
             }
 
             requestAnimationFrame(showClock);
