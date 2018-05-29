@@ -1,3 +1,6 @@
+<!--Example that is part of the Unity Timesync Client TimerGame plus ControlGame GameSide scene
+Please run it in the editor and refresh this page.
+-->
 <html>
 <head>
     <title>TimeSync Client</title>
@@ -7,7 +10,8 @@
     <script src="../TimeSync.js"></script>
 
     <style>
-        .wrapper {
+        .wrapper
+        {
             display: flex;
             flex-flow: column nowrap;
             outline: 2px solid black;
@@ -15,15 +19,18 @@
             margin: auto;
         }
 
-        .container {
+        .container 
+        {
             outline: 2px solid black;
         }
 
-         .roombuttonsContainer {
+        .roombuttonsContainer 
+        {
             outline: 3px solid black;
-        }
-
-        .gamecontrol {
+        }        
+        
+        .gamecontrolButton
+        {
             background: gray;
             width: 4rem;
             height: 4rem;
@@ -79,14 +86,16 @@
             justify-content: center            
         }
 
-        .progress {
+        .progress 
+        {
             font-family: helvetica;
             font-size: 48px;
             line-height: 48px;
             font-weight: bold;
         }
 
-        .status {
+        .status 
+        {
             font-family: monospace;
             white-space: pre;
             font-size: 14px;
@@ -97,47 +106,37 @@
         }       
     </style>
 </head>
-<body>  `
-
+<body> 
     <div class="wrapper">
         <div class="gameControlContainer" >
             <div id = "movementcontrols" style = "display:none">
-            <button class="gamecontrol gamecontrolscontainerleft"   onclick="f_SendCustomMessage('A')"> left  </button>
-            <button class="gamecontrol gamecontrolscontainerbottom" onclick="f_SendCustomMessage('S')"> down </button>
-            <button class="gamecontrol gamecontrolscontainerright"  onclick="f_SendCustomMessage('D')"> right </button>
-            <button class="gamecontrol gamecontrolscontainertop"    onclick="f_SendCustomMessage('W')"> up </button>            
+                <button class="gamecontrolButton gamecontrolscontainerleft"   onclick="f_SendCustomMessage('A')"> left  </button>
+                <button class="gamecontrolButton gamecontrolscontainerbottom" onclick="f_SendCustomMessage('S')"> down </button>
+                <button class="gamecontrolButton gamecontrolscontainerright"  onclick="f_SendCustomMessage('D')"> right </button>
+                <button class="gamecontrolButton gamecontrolscontainertop"    onclick="f_SendCustomMessage('W')"> up </button>            
             </div>
 
             <div id = "timergamecontrols" style = "display:none">
-            <button class="gamecontrol gamecontrolscontainermiddle" onclick="f_SendCustomMessage('PRESSED')">Press</button>
+                <button class="gamecontrolButton gamecontrolscontainermiddle" onclick="f_SendCustomMessage('PRESSED')">Press</button>
             </div>
         </div>
 
         <div class="container">
-                <!-- join room button field with standard fill-->      
-                <input type="button" id="joinroombutton" value="Join Room          "   onclick="f_JoinRoom();" /> <input id = "joinRoomField" input type="text" value = "EVERYTHING" name="fname"><br>        
-                <input type="button" id="leaveroombutton" style = "display:none" value="Leave Room          "   onclick="f_LeaveRoom();" /> 
-                <input type="button" value="Private Message"   onclick="f_DirectMessage('Direct',{'One' : 'Two'});" />
-                <input id = "sendDirectMessageField" input type="text" value = "xxxxxxxx-xxxx-xxxx-xxxx-xxGAMEMASTER" name="fname"><br>
+            <!-- join room button field with standard fill-->      
+            <input type="button" id="joinroombutton" value="Join Room          "   onclick="f_JoinRoom();" /> <input id = "joinRoomField" input type="text" value = "EVERYTHING" name="fname"><br>        
+            <input type="button" id="leaveroombutton" style = "display:none" value="Leave Room          "   onclick="f_LeaveRoom();" /><br>
+            <input type="button" value="Private Message"   onclick="f_DirectMessage('Direct',{'One' : 'Two'});" />
+            <input id = "sendDirectMessageField" input type="text" value = "xxxxxxxx-xxxx-xxxx-xxxx-xxGAMEMASTER" name="fname"><br>
         </div>
         
-        <!--#region divs  -->
-        <div class="container">
-            
+        <div class="container">            
             <div id="progress" class="progress">0%</div>
             <div id="status" class="status">Connecting</div>
             <div id="timeoffset" class="status"></div>
             <div id="userID" class = "status"> </div>           
-        </div>
+        </div>        
+    </div>        
 
-        
-    </div>
-
-
-    
-    <!--#endregion -->
-
-    <!--#region example scripts-->
     <script>
         //define timeSyncClient
         var tsClient = new TIMESYNC.Client({debug: true}),
@@ -151,19 +150,20 @@
         tsClient.registerHandler("leave_room",onLeaveRoom);
         tsClient.registerHandler("join_room",onRoomJoin);
         tsClient.registerHandler("chat",onChatRecieved);
-        tsClient.registerHandler("room_properties_changed",f_CheckRecievedRoomProperties);
+        tsClient.registerHandler("room_properties_changed",onRecievedRoomProperties);
         
-        //register common control that should not have to be handled in any way
+        //register common control that should be ignored by the timesync webclient.
         tsClient.registerHandler("W",empty);
         tsClient.registerHandler("A",empty);
         tsClient.registerHandler("S",empty);
         tsClient.registerHandler("D",empty);
         tsClient.registerHandler("PRESSED",empty);
         
-        //function that is triggered when any known input should be ignored by the console.
-        function empty(){}
+        //----------------------------------------------------------------------------------------- 
+        //                                     Functions                     
+        //-----------------------------------------------------------------------------------------
         
-        //sends a message with join_room and the desired room to join in the field.
+        //sends join_room message to the server.
         function f_JoinRoom()
         {
             console.log("Joining room...")
@@ -173,148 +173,24 @@
             tsClient.newMsg("join_room",{room : fieldVal}).send();
         }
         
+        //sends leave room message to server.
         function f_LeaveRoom()
         {
             tsClient.newMsg("leave_room").send();
         }
 
-        function onRoomJoin(msg)
-        {             
-            if(msg.body.error)
-            {
-                console.log("Waiting for host, trying to join room again in 5 seconds...");
-                setTimeout(function(){ f_JoinRoom(); }, 5000);
-                return;
-            }
-            else
-            {          
-                console.log("Hello");        
-                document.getElementById("joinroombutton").style.display = "none";
-                document.getElementById("leaveroombutton").style.display = "inline-block";
-
-                //try to get the properties (if available)
-                if(msg.body.properties)
-                {
-                    f_CheckRecievedRoomProperties(msg);
-                }
-                else
-                {
-                    console.log("No properties available");
-                }
-            }
-
-            console.log("Message" , msg);
-        }  
-
-        function onLeaveRoom()
-        {
-            document.getElementById("leaveroombutton").style.display = "none";
-            document.getElementById("joinroombutton").style.display = "inline-block";
-        }
-
-        function f_CheckRecievedRoomProperties(msg)
-        {
-            console.log(msg);
-            switch(msg.body.properties["ControlScheme"])
-            {
-                case "TimerGame":
-                document.getElementById("movementcontrols").style.display = "none";
-                document.getElementById("timergamecontrols").style.display = "inline-block";
-                console.log("Recieved timergame controlscheme");
-                //switch the controls of this web client to something else. (display other div)
-                break;
-
-                case "MoveControls":
-                document.getElementById("movementcontrols").style.display = "inline-block";
-                document.getElementById("timergamecontrols").style.display = "none";
-                console.log("Recieved usercontrol controlscheme");
-                //switch the controls of this web client to something else. (display other div)
-                break;
-
-                default:
-                console.log("Controlscheme not implemented") 
-                break;
-            }
-        }
-        
-        function onChatRecieved(msg)
-        {
-            if(msg.body.message)
-            {
-                console.log(msg.body.message);
-            }
-            else
-            {
-                console.log(msg.body.message);
-            }
-        }
-
-        //logs the string of the recieves message.
-        function onGeneralCallBack(msg)
-        {
-            if(msg.body.error)
-            {
-                //log the error message of the body.
-                console.log("ERROR" , msg.body.error);
-                return;
-            }
-
-            console.log("Message" , msg);
-        }
-        
-        //@todo implement.
-        function f_BroadcastMessage()
-        {
-            //@todo, sends messages.
-        }
-
-        // @todo implement.
+        //Sends a message and fills the to: field, thus sending it directly to the user.
         function f_DirectMessage(type,body,to)
         {
             var fieldVal = document.getElementById("sendDirectMessageField").value;
             tsClient.directMsg(type,body, fieldVal).send();
         }
-        
-        //@todo implement 
-        function f_SendCustomMessage(type)
+
+        //sends a message with a given type and body.
+        function f_SendCustomMessage(type,body)
         {
-            tsClient.newMsg(type).send();
+            tsClient.newMsg(type,body).send();
         }
-
-        //register for events that fire from TimeSync.js
-        tsClient.on("connected", function (e) {           
-            statusEl.innerHTML = "Connection Established";
-            f_JoinRoom();
-        });
-
-        tsClient.on("connectionerror", function (e) {
-            statusEl.innerHTML = "Connection Error Occured";
-        });
-
-        tsClient.on("disconnected", function (e) {
-            statusEl.innerHTML = "Connection Terminated";
-        });
-
-        tsClient.on("syncestablished", function (e) {
-            clockOffset = tsClient.getClockOffset();
-            stats = tsClient.getStats();
-            statusEl.innerHTML = "Sync Established";
-        });
-
-        tsClient.on("syncprogress", function (e) {
-            statusEl.innerHTML = "Syncing";
-            progressEl.innerHTML = Math.floor(e.details * 100) + "%";
-        });
-
-        // ESTABLISH A SERVER CONNECTION
-        tsClient.connect("wss://nl020.cube-cloud.com/timesync");
-
-        
-
-        //tsClient.connect("wss://timesync.cube-cloud.com/timesync");
-
-        //local connection (for testing)
-        //tsClient.connect("ws://localhost:8080");
 
         // DEMO METHODS
         function showClock () {
@@ -339,8 +215,114 @@
             var d = new Date(ms);
             return d.toLocaleTimeString();
         };
+        
+        //----------------------------------------------------------------------------------------- 
+        //                                     Handler functions                    
+        //-----------------------------------------------------------------------------------------
 
+        //checks for errors and retries to join if present. Shows controls when  otherwise hides join room button and checks for room properties.
+        function onRoomJoin(msg)
+        {             
+            if(msg.body.error)
+            {
+                console.log("Waiting for host, trying to join room again in 5 seconds...");
+                setTimeout(function(){ f_JoinRoom(); }, 5000);
+                return;
+            }
+            else
+            {                
+                document.getElementById("joinroombutton").style.display = "none";
+                document.getElementById("leaveroombutton").style.display = "inline-block";
+
+                //try to get the properties (if available)
+                if(msg.body.properties)
+                {
+                    onRecievedRoomProperties(msg);
+                }
+                else
+                {
+                    console.log("No room properties available");
+                }
+            }
+        }  
+
+        //logs the recieved chat message.
+        function onChatRecieved(msg)
+        {
+            console.log(msg.body.chat);
+        }
+
+        //hides controls and leave room button
+        function onLeaveRoom()
+        {
+            document.getElementById("leaveroombutton").style.display = "none";
+            document.getElementById("joinroombutton").style.display = "inline-block";
+            document.getElementById("movementcontrols").style.display = "none";
+            document.getElementById("timergamecontrols").style.display = "none";
+        }
+
+        //Checks if recieved room properties contain a controlscheme. If so, changes the visibility of the layout 
+        function onRecievedRoomProperties(msg)
+        {
+            console.log(msg);
+            switch(msg.body.properties["ControlScheme"])
+            {
+                case "TimerGame":
+                document.getElementById("movementcontrols").style.display = "none";
+                document.getElementById("timergamecontrols").style.display = "inline-block";
+                console.log("Recieved timergame controlscheme");
+                //switch the controls of this web client to something else. (display other div)
+                break;
+
+                case "MoveControls":
+                document.getElementById("movementcontrols").style.display = "inline-block";
+                document.getElementById("timergamecontrols").style.display = "none";
+                console.log("Recieved usercontrol controlscheme");
+                //switch the controls of this web client to something else. (display other div)
+                break;
+
+                default:
+                console.log("Controlscheme not implemented") 
+                break;
+            }
+        }        
+
+        //function that is triggered when any known input should be ignored by the console.
+        function empty(){}
+
+        //register for events that fire from TimeSync.js
+        tsClient.on("connected", function (e) {         
+            statusEl.innerHTML = "Connection Established";
+            f_JoinRoom();
+        });
+
+        tsClient.on("connectionerror", function (e) {
+            statusEl.innerHTML = "Connection Error Occured";
+        });
+
+        tsClient.on("disconnected", function (e) {
+            statusEl.innerHTML = "Connection Terminated";
+        });
+
+        tsClient.on("syncestablished", function (e) {
+            clockOffset = tsClient.getClockOffset();
+            stats = tsClient.getStats();
+            statusEl.innerHTML = "Sync Established";
+        });
+
+        tsClient.on("syncprogress", function (e) {
+            statusEl.innerHTML = "Syncing";
+            progressEl.innerHTML = Math.floor(e.details * 100) + "%";
+        });
+
+        //----------------------------------------------------------------------------------------- 
+        //                                     Connect                 
+        //-----------------------------------------------------------------------------------------
+        
+        // ESTABLISH A SERVER CONNECTION
+        tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+        
+        //show the clock
         showClock();
     </script>
-    <!--#endregion-->
 </body>
