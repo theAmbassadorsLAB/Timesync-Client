@@ -1,0 +1,328 @@
+<!--Example that is part of the Unity Timesync Client TimerGame plus ControlGame GameSide scene
+Please run it in the editor and refresh this page.
+-->
+<html>
+<head>
+    <title>TimeSync Client</title>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="viewport" content="width=device-width, initial-scale=1,user-scalable=no,maximum-scale=1">
+    <script src="../TimeSync.js"></script>
+
+    <style>
+        .wrapper
+        {
+            display: flex;
+            flex-flow: column nowrap;
+            outline: 2px solid black;
+            max-width: 80ex;
+            margin: auto;
+        }
+
+        .container 
+        {
+            outline: 2px solid black;
+        }
+
+        .roombuttonsContainer 
+        {
+            outline: 2px solid black;
+        }        
+        
+        .gamecontrolButton
+        {
+            background: gray;
+            width: 4rem;
+            height: 4rem;
+            position: absolute;
+        }
+     
+        .gameControlContainer
+        {            
+            height: 35rem;
+            position: relative;
+        }
+
+        .gamecontrolscontainerleft
+        {
+            top: 50%;
+            left: 3;
+            transform: translate(0, -50%);
+        }
+
+         .gamecontrolscontainermiddle
+        {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .gamecontrolscontainerright
+        {
+            top: 50%;
+            right: 3;
+            transform: translate(0, -50%);
+        }
+
+        .gamecontrolscontainerbottom
+        {
+            bottom: 3;
+            right: 50%;
+            transform: translate(50%, 0);
+        }
+
+        .gamecontrolscontainertop
+        {
+            top: 3;
+            right: 50%;
+            transform: translate(50%, 0);
+        }
+
+        .othercontainer
+        {         
+            height: 10em;            
+            display: flex;
+            align-items: center;
+            justify-content: center            
+        }
+
+        .progress 
+        {
+            font-family: helvetica;
+            font-size: 48px;
+            line-height: 48px;
+            font-weight: bold;
+        }
+
+        .status 
+        {
+            font-family: monospace;
+            white-space: pre;
+            font-size: 14px;
+            line-height: 14px;
+            font-weight: normal;
+            text-align: left;
+            margin-top: 12px;
+        }       
+    </style>
+</head>
+<body> 
+    <div class="wrapper">
+        <div class="gameControlContainer" >
+            <div id = "movementcontrols" style = "display:none">
+                <button class="gamecontrolButton gamecontrolscontainerleft"   onclick="f_SendCustomMessage('A')"> left  </button>
+                <button class="gamecontrolButton gamecontrolscontainerbottom" onclick="f_SendCustomMessage('S')"> down </button>
+                <button class="gamecontrolButton gamecontrolscontainerright"  onclick="f_SendCustomMessage('D')"> right </button>
+                <button class="gamecontrolButton gamecontrolscontainertop"    onclick="f_SendCustomMessage('W')"> up </button>            
+            </div>
+
+            <div id = "timergamecontrols" style = "display:none">
+                <button class="gamecontrolButton gamecontrolscontainermiddle" onclick="f_SendCustomMessage('PRESSED')">Press</button>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- join room button field with standard fill-->      
+            <input type="button" id="joinroombutton" value="Join Room          "   onclick="f_JoinRoom();" /> <input id = "joinRoomField" input type="text" value = "EVERYTHING" name="fname"><br>        
+            <input type="button" id="leaveroombutton" style = "display:none" value="Leave Room          "   onclick="f_LeaveRoom();" /><br>
+            <input type="button" value="Private Message"   onclick="f_DirectMessage('Direct',{'One' : 'Two'});" />
+            <input id = "sendDirectMessageField" input type="text" value = "xxxxxxxx-xxxx-xxxx-xxxx-xxGAMEMASTER" name="fname"><br>
+        </div>
+        
+        <div class="container">            
+            <div id="progress" class="progress">0%</div>
+            <div id="status" class="status">Connecting</div>
+            <div id="timeoffset" class="status"></div>
+            <div id="userID" class = "status"> </div>           
+        </div>        
+    </div>        
+
+    <script>
+        //define timeSyncClient
+        var tsClient = new TIMESYNC.Client({debug: true}),
+            progressEl = document.getElementById("progress"),
+            statusEl = document.getElementById("status"),
+            timeoffsetEl = document.getElementById("timeoffset"),
+            clockOffset,
+            stats;
+
+        //register general handler messages.
+        tsClient.registerHandler("leave_room",onLeaveRoom);
+        tsClient.registerHandler("join_room",onRoomJoin);
+        tsClient.registerHandler("chat",onChatRecieved);
+        tsClient.registerHandler("room_properties_changed",onRecievedRoomProperties);
+        
+        //register common control that should be ignored by the timesync webclient.
+        tsClient.registerHandler("W",empty);
+        tsClient.registerHandler("A",empty);
+        tsClient.registerHandler("S",empty);
+        tsClient.registerHandler("D",empty);
+        tsClient.registerHandler("PRESSED",empty);
+        
+        //----------------------------------------------------------------------------------------- 
+        //                                     Functions                     
+        //-----------------------------------------------------------------------------------------
+        
+        //sends join_room message to the server.
+        function f_JoinRoom()
+        {
+            console.log("Joining room...")
+            //get the value from the join room field.
+            var fieldVal = document.getElementById("joinRoomField").value;
+            //send the message
+            tsClient.newMsg("join_room",{room : fieldVal}).send();
+        }
+        
+        //sends leave room message to server.
+        function f_LeaveRoom()
+        {
+            tsClient.newMsg("leave_room").send();
+        }
+
+        //Sends a message and fills the to: field, thus sending it directly to the user.
+        function f_DirectMessage(type,body)
+        {
+            var to = document.getElementById("sendDirectMessageField").value;
+            tsClient.directMsg(type,to,body).send();
+        }
+
+        //sends a message with a given type and body.
+        function f_SendCustomMessage(type,body)
+        {
+            tsClient.newMsg(type,body).send();
+        }
+
+        // DEMO METHODS
+        function showClock () {
+            if (clockOffset === undefined) {
+                timeoffsetEl.innerHTML = "Local Time:              " + formatTime(tsClient.now());
+            } else {
+                timeoffsetEl.innerHTML =
+                    "Local Time:              " + formatTime(tsClient.now()) +
+                    "<br>Synced Time:             " + formatTime(tsClient.clock()) +
+                    "<br>Clock Offset:            " + clockOffset + " ms" +
+                    "<br>" +
+                    "<br>Sync Duration:           " + stats.sync_duration + " ms" +
+                    "<br>Total Samples:           " + stats.total_samples +
+                    "<br>Average Sample Duration: " + stats.average_sample_time + " ms" +
+                    "<br>UUID:                    " + tsClient.getId();
+            }
+
+            requestAnimationFrame(showClock);
+        };
+
+        function formatTime (ms) {
+            var d = new Date(ms);
+            return d.toLocaleTimeString();
+        };
+        
+        //----------------------------------------------------------------------------------------- 
+        //                                     Handler functions                    
+        //-----------------------------------------------------------------------------------------
+
+        //checks for errors and retries to join if present. Shows controls when  otherwise hides join room button and checks for room properties.
+        function onRoomJoin(msg)
+        {             
+            if(msg.body.error)
+            {
+                console.log("Waiting for host, trying to join room again in 5 seconds...");
+                setTimeout(function(){ f_JoinRoom(); }, 5000);
+                return;
+            }
+            else
+            {                
+                document.getElementById("joinroombutton").style.display = "none";
+                document.getElementById("leaveroombutton").style.display = "inline-block";
+
+                //try to get the properties (if available)
+                if(msg.body.properties)
+                {
+                    onRecievedRoomProperties(msg);
+                }
+                else
+                {
+                    console.log("No room properties available");
+                }
+            }
+        }  
+
+        //logs the recieved chat message.
+        function onChatRecieved(msg)
+        {
+            console.log(msg.body.chat);
+        }
+
+        //hides controls and leave room button
+        function onLeaveRoom()
+        {
+            document.getElementById("leaveroombutton").style.display = "none";
+            document.getElementById("joinroombutton").style.display = "inline-block";
+            document.getElementById("movementcontrols").style.display = "none";
+            document.getElementById("timergamecontrols").style.display = "none";
+        }
+
+        //Checks if recieved room properties contain a controlscheme. If so, changes the visibility of the layout 
+        function onRecievedRoomProperties(msg)
+        {
+            console.log(msg);
+            switch(msg.body.properties["ControlScheme"])
+            {
+                case "TimerGame":
+                document.getElementById("movementcontrols").style.display = "none";
+                document.getElementById("timergamecontrols").style.display = "inline-block";
+                console.log("Recieved timergame controlscheme");
+                //switch the controls of this web client to something else. (display other div)
+                break;
+
+                case "MoveControls":
+                document.getElementById("movementcontrols").style.display = "inline-block";
+                document.getElementById("timergamecontrols").style.display = "none";
+                console.log("Recieved usercontrol controlscheme");
+                //switch the controls of this web client to something else. (display other div)
+                break;
+
+                default:
+                console.log("Controlscheme not implemented") 
+                break;
+            }
+        }        
+
+        //function that is triggered when any known input should be ignored by the console.
+        function empty(){}
+
+        //register for events that fire from TimeSync.js
+        tsClient.on("connected", function (e) {         
+            statusEl.innerHTML = "Connection Established";
+            f_JoinRoom();
+        });
+
+        tsClient.on("connectionerror", function (e) {
+            statusEl.innerHTML = "Connection Error Occured";
+        });
+
+        tsClient.on("disconnected", function (e) {
+            statusEl.innerHTML = "Connection Terminated";
+        });
+
+        tsClient.on("syncestablished", function (e) {
+            clockOffset = tsClient.getClockOffset();
+            stats = tsClient.getStats();
+            statusEl.innerHTML = "Sync Established";
+        });
+
+        tsClient.on("syncprogress", function (e) {
+            statusEl.innerHTML = "Syncing";
+            progressEl.innerHTML = Math.floor(e.details * 100) + "%";
+        });
+
+        //----------------------------------------------------------------------------------------- 
+        //                                     Connect                 
+        //-----------------------------------------------------------------------------------------
+        
+        // ESTABLISH A SERVER CONNECTION
+        tsClient.connect("wss://nl020.cube-cloud.com/timesync");
+        
+        //show the clock
+        showClock();
+    </script>
+</body>
