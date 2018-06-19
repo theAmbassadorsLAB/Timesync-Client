@@ -151,6 +151,7 @@ Please run it in the editor and refresh this page.
         tsClient.registerHandler("join_room",onRoomJoin);
         tsClient.registerHandler("chat",onChatRecieved);
         tsClient.registerHandler("room_properties_changed",onRecievedRoomProperties);
+        tsClient.registerHandler("get_users",onGetUsers);
         
         //register common control that should be ignored by the timesync webclient.
         tsClient.registerHandler("W",empty);
@@ -172,6 +173,11 @@ Please run it in the editor and refresh this page.
             //send the message
             tsClient.newMsg("join_room",{room : fieldVal}).send();
         }
+
+        function f_GetUsers()
+        {
+            tsClient.newMsg("get_users").send();
+        }
         
         //sends leave room message to server.
         function f_LeaveRoom()
@@ -183,7 +189,16 @@ Please run it in the editor and refresh this page.
         function f_DirectMessage(type,body)
         {
             var to = document.getElementById("sendDirectMessageField").value;
-            tsClient.directMsg(type,to,body).send();
+            var message = tsClient.directMsg(type,to,body); //.send();
+
+            if(message)
+            {
+                message.send();
+            }
+            else
+            {
+                console.log("Something went wrong constructing the direct message object");
+            }
         }
 
         //sends a message with a given type and body.
@@ -234,6 +249,9 @@ Please run it in the editor and refresh this page.
                 document.getElementById("joinroombutton").style.display = "none";
                 document.getElementById("leaveroombutton").style.display = "inline-block";
 
+                console.log("Trying to get users");
+                f_SendCustomMessage("get_users");
+
                 //try to get the properties (if available)
                 if(msg.body.properties)
                 {
@@ -245,6 +263,18 @@ Please run it in the editor and refresh this page.
                 }
             }
         }  
+
+        //on get users 
+        function onGetUsers(msg)
+        {
+            console.log(msg);
+            
+            if(msg.body.users)
+            {
+                console.log("Recieved users");
+                console.log(msg.body.users);
+            }
+        }
 
         //logs the recieved chat message.
         function onChatRecieved(msg)
