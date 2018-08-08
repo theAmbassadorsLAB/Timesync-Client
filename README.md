@@ -74,15 +74,43 @@ tsClient.on("syncprogress", function (e) {
 tsClient.connect("wss://nl020.cube-cloud.com/timesync");
 
 ```
+### Config:
+The TimeSync Client can be initiated with a config object holding the follwing optional properties:
+ 
+ - `debug`  
+ enable debug logging, defaults to false.
 
+ - `server`  
+ websocket server url, optional. Can also be provided while calling [tsClient.connect](#client.connect).
 
-Currently the TimeSync Server uses the following reserved Message types for client / server communication:
+ - `autoReconnect`  
+ automatically reconnect when a connection is dropped, defaults to true.
+
+ - `autoInitSync`  
+ automatically initiate a sync request upon a successful connection, defaults to true.
+
+ - `enableGeolocation`  
+ include the Client's geolocation with every Message being sent, defaults to false.
+
+ - `autoInitGeolocation`  
+ automatically request the current position from the Geolocation API when enableGeolocation is enabled, defaults to true. Turn this off if you prefer to inititiate it by yourself at a later point by calling [tsClient.initGeolocation](#client.initgeolocation).
+
+```javascript
+var tsClient = new TIMESYNC.Client({
+    debug: true,
+    enableGeolocation: true
+});
+```
 
 ### <a name="client.messages"></a>Messages:
+
+Currently the TimeSync Server uses the following reserved Message types for Client Server communication:
 
 - [claim_room](#server.claim_room)
 - [clockOffset](#server.clock_offset) _(private, receive only)_
 - [create_room](#server.create_room)
+- [close_room](#server.close_room)
+- [room_closed](#server.room_closed) _(private)_
 - [echo](#server.echo)
 - [get_rooms](#server.get_rooms)
 - [get_room_properties](#server.get_room_properties)
@@ -160,6 +188,17 @@ tsClient.newMsg("create_room", {room: 'test', token: 'baddpassword'}, function (
 ```
 
 ---
+<a name="server.close_room"></a>type: **close_room** () : String  
+Closes the room on the server and kicks any active users from the room.  
+`close_room` will broadcast a [room_closed](#server.room_closed) message to all connected users before closing down.  
+
+Note: only the owner is allowed to explicitly close a room. Rooms will automatically close when the last user leaves the room.  
+
+---
+<a name="server.room_closed"></a>type: **room_closed** () : String _(private)_  
+A message dispatched by the server when a room is closing down and has disconnected the user.
+
+---
 <a name="server.echo"></a>type: **echo** (...) : Anything JSON serializable  
 The echo message is a simple debug message type intended for testing server / client response. The server will simply bounce the message back to the client.
 ```javascript
@@ -183,8 +222,11 @@ tsClient.newMsg("get_rooms", {}, function (msg) { console.log(msg.rooms); }).sen
 
 ---
 <a name="server.get_room_properties"></a>type: **get_room_properties** : Object  
-Requests the properties of the current room. Use a callback or register a 'get_room_properties' message handler before dispatching the message.  
+Requests the properties of a specific room, or if none given the current room. Use a callback or register a 'get_room_properties' message handler before dispatching the message.  
 Note: the room properties are also included in the server response after successfully joining a room.
+
+Arguments:
+- room : String (optional)  
 
 Response:
 - properties : Object  
@@ -192,24 +234,28 @@ Response:
 ```javascript
 var tsClient = new TIMESYNC.Client();
 tsClient.connect("wss://nl020.cube-cloud.com/timesync");
-tsClient.newMsg("get_room_properties", {}, function (msg) { console.log(msg.properties); }).send();
+tsClient.newMsg("get_room_properties", {room: 'room_id'}, function (msg) { console.log(msg.properties); }).send();
 ```
 
 ---
 <a name="server.get_room_config"></a>type: **get_room_config** : Object  
-Requests the room configuration of the current room. Use a callback or register a 'get_room_config' message handler before dispatching the message.  
+Requests the room configuration of a specific room, or if none given the current room. Use a callback or register a 'get_room_config' message handler before dispatching the message.  
 Note: the room configuration is defined by the room owner. See [set_room_config](#server.set_room_config) for more details.
+
+Arguments:
+- room : String (optional)  
 
 Response:
 - broadcast: Boolean, custom type messages will be broadcasted to all users.
 - hidden: Boolean, hidden rooms will not be listed by the [get_rooms](#server.get_rooms) request.
 - maxUsers: Int, the maximum amount of users that can join this room.
 - locked: Boolean, locked rooms won't except any [join_room](#server.join_room) requests.
+- geolocation: Object {latitude, longitude, accuracy}
 
 ```javascript
 var tsClient = new TIMESYNC.Client();
 tsClient.connect("wss://nl020.cube-cloud.com/timesync");
-tsClient.newMsg("get_room_config", {}, function (msg) { console.log(msg); }).send();
+tsClient.newMsg("get_room_config", {room: 'room_id'}, function (msg) { console.log(msg); }).send();
 ```
 
 ---
