@@ -132,6 +132,58 @@ TIMESYNC.Client = function (cfg) {
         return (new Date()).getTime();  // ms
     };
 
+    this.initGeolocation = function (errorHandler, options) {
+        errorHandler = errorHandler || this.handleGeolocationError;
+        options = options || {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 5000
+        };
+
+        this.geolocation = {};
+
+        var scope = this;
+
+        if (navigator.geolocation) {
+            this.geolocationId = navigator.geolocation.watchPosition(function (position) {
+                scope.updateGeolocation.call(scope, position);
+            }, function (e) {
+                errorHandler.call(scope, e);
+            }, options);
+
+        } else {
+            console.error('Geolocation is not supported by this browser.');
+            return this.enableGeolocation = false;
+        }
+    };
+
+    this.handleGeolocationError = function (error) {
+        this.geolocation = {};
+
+        switch(error.code) {
+        case error.PERMISSION_DENIED:
+            break;
+        case error.POSITION_UNAVAILABLE:
+            console.warn('Geolocation: Location information is unavailable.');
+            break;
+        case error.TIMEOUT:
+            console.warn('Geolocation, The request to get user location timed out.');
+            break;
+        case error.UNKNOWN_ERROR:
+            console.warn('Geolocation, An unknown error occurred.');
+            break;
+        }
+    };
+
+    this.updateGeolocation = function (position) {
+        console.log('updateGeolocation', position, this);
+        this.geolocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+        };
+    };
+
     this.addListener = function (type, listener) {
         if (this.listeners.hasOwnProperty(type) === false) {
             this.listeners[type] = [];
@@ -231,9 +283,16 @@ TIMESYNC.Client.prototype.init = function (cfg) {
     this.config.server = cfg.server || window.location.hostname;
     this.config.autoReconnect = cfg.autoReconnect === undefined ? true : cfg.autoReconnect;
     this.config.autoInitSync = cfg.autoInitSync === undefined ? true : cfg.autoInitSync;
+    this.config.enableGeolocation = cfg.enableGeolocation || false;
+    this.config.autoInitGeolocation = cfg.autoInitGeolocation === undefined ? true : cfg.autoInitGeolocation;
 
     // make sure our own uuid is set
     this.getId();
+
+    // enable Geolocation
+    if (this.config.enableGeolocation && this.config.autoInitGeolocation) {
+        this.initGeolocation();
+    }
 
     // register default message handlers
     this.registerHandler('onPing', function (msg) {
@@ -502,7 +561,12 @@ TIMESYNC.Message.prototype.send = function () {
         var conn = this.getClient().getConnection();
 
         if (conn) {
+            // set the timestamp if needed
             if (this.getTs() === undefined) { this.setTs(this.getClient().clock()); }
+
+            // set the geolocation if needed
+            if (this.enableGeolocation) { this.setGeolocation(this.getClient().getGeolocation()); }
+
             conn.send(this);
 
         } else {
@@ -524,6 +588,9 @@ TIMESYNC.Message.prototype.setType = function (type) { this.head.type = type; re
 
 TIMESYNC.Message.prototype.getTs = function () { return this.head.ts; };
 TIMESYNC.Message.prototype.setTs = function (ts) { this.head.ts = ts; return this; };
+
+TIMESYNC.Message.prototype.getGeolocation = function () { return this.head.geolocation; };
+TIMESYNC.Message.prototype.setGeolocation = function (latitude, longitude, accuracy) { this.head.geolocation = {latitude: latitude, longitude: longitude, accuracy: accuracy}; return this; };
 
 TIMESYNC.Message.prototype.getBody = function () { return this.body; };
 TIMESYNC.Message.prototype.setBody = function (body) { this.body = body; return this; };
