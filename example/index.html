@@ -43,7 +43,7 @@
     </div>
 
     <script>
-        var tsClient = new TIMESYNC.Client({debug: true}),
+        var tsClient = new TIMESYNC.Client({debug: true, enableGeolocation: true}),
             progressEl = document.getElementById("progress"),
             statusEl = document.getElementById("status"),
             timeoffsetEl = document.getElementById("timeoffset"),
@@ -89,6 +89,10 @@
                     "Local Time:              " + formatTime(tsClient.now()) +
                     "<br>Synced Time:             " + formatTime(tsClient.clock()) +
                     "<br>Clock Offset:            " + clockOffset + " ms" +
+                    "<br>" +
+                    "<br>Latitude:                " + tsClient.geolocation.latitude +
+                    "<br>Longitude:               " + tsClient.geolocation.longitude +
+                    "<br>Accuracy:                " + tsClient.geolocation.accuracy + " m" +
                     "<br>" +
                     "<br>Sync Duration:           " + stats.sync_duration + " ms" +
                     "<br>Total Samples:           " + stats.total_samples +
