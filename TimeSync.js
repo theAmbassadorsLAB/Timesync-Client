@@ -329,7 +329,6 @@ TIMESYNC.Client.prototype.init = function (cfg) {
     });
 
     this.registerHandler('user_count', function (msg) {
-        this.log('userCount', msg.body.count);
         this.fireEvent('usercount', msg.body.count);
     });
 
@@ -434,22 +433,20 @@ TIMESYNC.Client.prototype.log = function () {
     }
 };
 
-//newMsg function but with a 'to' in the head
+// newMsg function but with a 'to' in the head
 TIMESYNC.Client.prototype.directMsg = function (type, to, body, callback, scope) {
     type = type || 'echo';
-    body = body || '';
+    body = body || {};
 
-    if(!to)
-    {        
-        console.log("directMsg requires a to value");
-        return;
-    }    
+    if (!to) {
+        console.error('directMsg requires a `to` value');
+        return false;
+    }
 
     var msg = new TIMESYNC.Message({head: {type: type, to: to}, body: body}).bind(this);
 
     // register the callback
-    if (callback) 
-    {
+    if (callback) {
         this.msgCallbacks[msg.id] = {fn: callback, scope: scope};
     }
 
