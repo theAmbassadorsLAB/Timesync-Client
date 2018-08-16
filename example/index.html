@@ -7,13 +7,26 @@
     <script src="../TimeSync.js"></script>
 
     <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            font-size: 14px;
+            line-height: 14px;
+            font-weight: normal;
+        }
+
+        label {
+            display: inline-block;
+            width: 75px;
+            vertical-align: top;
+        }
+
         .container {
             width: 300px;
             height: 48px;
             position: absolute;
             top: -24px;
             left: -150px;
-            margin-top: 40%;
+            margin-top: 20%;
             margin-left: 50%
         }
 
@@ -33,6 +46,32 @@
             text-align: left;
             margin-top: 12px;
         }
+
+        textarea {
+            font-family: monospace;
+            white-space: pre;
+            font-size: 14px;
+            line-height: 14px;
+            font-weight: normal;
+            text-align: left;
+            vertical-align: top;
+            border-color: rgb(190, 190, 190);
+            border-width: 0.5px;
+            border-bottom-style: inset;
+        }
+        
+        input[type=button] {
+            display: block;
+            margin-left: 75px;
+            width: 100px;
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .divider {
+            background-color:rgb(0,0,0);
+            height: 1px; width: 100%;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -40,10 +79,27 @@
         <div id="progress" class="progress">0%</div>
         <div id="status" class="status">Connecting</div>
         <div id="timeoffset" class="status"></div>
+
+        <div class="divider"></div>
+
+        <label for="room_field">Room: </label><input id="room_field" type="text" value="example" name="room_name" style="width: 200px;"><br>
+        <label for="token_field">Token: </label><input id="token_field" type="text" value="super_secret_token" name="room_token" style="width: 200px;">
+        <div>
+            <input type="button" id="createroombutton" value="Create Room" onclick="f_CreateRoom();">
+            <input type="button" id="joinroombutton" value="Join Room" onclick="f_JoinRoom();">
+            <input type="button" id="leaveroombutton" value="Leave Room" onclick="f_LeaveRoom();">
+        </div>
+
+        <div class="divider"></div>
+
+        <label for="type_field">Type: </label><input id="type_field" type="text" value="echo" name="msg_type" style="width: 200px;"><br>
+        <label for="body_field">Message: </label><textarea id="body_field" type="textarea" name="msg_body" style="width: 200px; height: 200px;">{}</textarea><br>
+        <input type="button" id="send_message" value="Send" width="100" onclick="f_SendCustomMessage();">
+
     </div>
 
     <script>
-        var tsClient = new TIMESYNC.Client({debug: true, enableGeolocation: true}),
+        var tsClient = new TIMESYNC.Client({debug: true, geolocation: true}),
             progressEl = document.getElementById("progress"),
             statusEl = document.getElementById("status"),
             timeoffsetEl = document.getElementById("timeoffset"),
@@ -74,6 +130,53 @@
             statusEl.innerHTML = "Syncing";
             progressEl.innerHTML = Math.floor(e.details * 100) + "%";
         });
+
+
+        function f_CreateRoom() {
+            var room = document.getElementById("room_field").value,
+                token = document.getElementById("token_field").value,
+                cfg = {
+                    room: room,
+                    token: token,
+                    geolocation: {
+                        latitude: 42.367727,
+                        longitude: 4.9468722,
+                        accuracy: 1000,
+                    }
+                };
+            tsClient.newMsg("create_room", cfg, f_log_response).send();
+        }
+
+        function f_JoinRoom() {
+            var room = document.getElementById("room_field").value;
+
+            tsClient.newMsg("join_room", {room: room}, f_log_response).send();
+        }
+
+        function f_LeaveRoom() {
+            tsClient.newMsg("leave_room", {}, f_log_response).send();
+        }
+
+        function f_SendCustomMessage() {
+            var type = document.getElementById("type_field").value,
+                body = document.getElementById("body_field").value || "{}";
+
+            if (!type) {
+                console.error('invalid message type', type);
+                return false;
+            }
+
+            try {
+                body = JSON.parse(body);
+                tsClient.newMsg(type, body, f_log_response).send();
+            } catch (e) {
+                console.error('invalid message body', e);
+            }
+        }
+
+        function f_log_response(body) {
+            console.debug(body);
+        }
 
         // ESTABLISH A SERVER CONNECTION
 
