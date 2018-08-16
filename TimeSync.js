@@ -48,6 +48,7 @@ TIMESYNC.Client = function (cfg) {
     // ************************************************************************
 
     this.config = {};
+    this.geolocation = {};
 
     // ************************************************************************
     // PRIVILEGED METHODS
@@ -153,7 +154,7 @@ TIMESYNC.Client = function (cfg) {
 
         } else {
             console.error('Geolocation is not supported by this browser.');
-            return this.enableGeolocation = false;
+            return this.config.geolocation = false;
         }
     };
 
@@ -176,12 +177,13 @@ TIMESYNC.Client = function (cfg) {
     };
 
     this.updateGeolocation = function (position) {
-        console.log('updateGeolocation', position, this);
         this.geolocation = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             accuracy: position.coords.accuracy,
         };
+
+        this.fireEvent('geolocation', position);
     };
 
     this.addListener = function (type, listener) {
@@ -283,14 +285,14 @@ TIMESYNC.Client.prototype.init = function (cfg) {
     this.config.server = cfg.server || window.location.hostname;
     this.config.autoReconnect = cfg.autoReconnect === undefined ? true : cfg.autoReconnect;
     this.config.autoInitSync = cfg.autoInitSync === undefined ? true : cfg.autoInitSync;
-    this.config.enableGeolocation = cfg.enableGeolocation || false;
+    this.config.geolocation = cfg.geolocation || false;
     this.config.autoInitGeolocation = cfg.autoInitGeolocation === undefined ? true : cfg.autoInitGeolocation;
 
     // make sure our own uuid is set
     this.getId();
 
     // enable Geolocation
-    if (this.config.enableGeolocation && this.config.autoInitGeolocation) {
+    if (this.config.geolocation && this.config.autoInitGeolocation) {
         this.initGeolocation();
     }
 
@@ -555,14 +557,16 @@ TIMESYNC.Message.prototype.toString = function () {
 // for each message type that we send to the server, just to receive a response.
 TIMESYNC.Message.prototype.send = function () {
     if (this.validate()) {
-        var conn = this.getClient().getConnection();
+        var client = this.getClient(),
+            conn = client.getConnection();
+
 
         if (conn) {
             // set the timestamp if needed
-            if (this.getTs() === undefined) { this.setTs(this.getClient().clock()); }
+            if (this.getTs() === undefined) { this.setTs(client.clock()); }
 
             // set the geolocation if needed
-            if (this.enableGeolocation) { this.setGeolocation(this.getClient().getGeolocation()); }
+            if (client.config.geolocation) { this.setGeolocation(client.geolocation.latitude, client.geolocation.longitude, client.geolocation.accuracy); }
 
             conn.send(this);
 

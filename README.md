@@ -89,16 +89,16 @@ The TimeSync Client can be initiated with a config object holding the follwing o
  - `autoInitSync`  
  automatically initiate a sync request upon a successful connection, defaults to true.
 
- - `enableGeolocation`  
+ - `geolocation`  
  include the Client's geolocation with every Message being sent, defaults to false.
 
  - `autoInitGeolocation`  
- automatically request the current position from the Geolocation API when enableGeolocation is enabled, defaults to true. Turn this off if you prefer to inititiate it by yourself at a later point by calling [tsClient.initGeolocation](#client.initgeolocation).
+ automatically request the current position from the Geolocation API when geolocation is enabled, defaults to true. Turn this off if you prefer to inititiate it by yourself at a later point by calling [tsClient.initGeolocation](#client.initgeolocation).
 
 ```javascript
 var tsClient = new TIMESYNC.Client({
     debug: true,
-    enableGeolocation: true
+    geolocation: true
 });
 ```
 
@@ -176,6 +176,7 @@ Arguments:
 - hidden : Boolean (optional)
 - maxUsers : Int (optional)
 - locked : Boolean (optional)
+- geolocation: Object (optional)
 
 Response:
 - room : String, the room ID
@@ -246,10 +247,10 @@ Arguments:
 - room : String (optional)  
 
 Response:
-- broadcast: Boolean, custom type messages will be broadcasted to all users.
-- hidden: Boolean, hidden rooms will not be listed by the [get_rooms](#server.get_rooms) request.
-- maxUsers: Int, the maximum amount of users that can join this room.
-- locked: Boolean, locked rooms won't except any [join_room](#server.join_room) requests.
+- broadcast: Boolean, custom type messages will be broadcasted to all users. Defaults to true.
+- hidden: Boolean, hidden rooms will not be listed by the [get_rooms](#server.get_rooms) request. Defaults to false.
+- maxUsers: Int, the maximum amount of users that can join this room. Defaults to unlimited (0).
+- locked: Boolean, locked rooms won't except any [join_room](#server.join_room) requests. Defaults to false.
 - geolocation: Object {latitude, longitude, accuracy}
 
 ```javascript
@@ -565,6 +566,7 @@ Parameters:
 - [syncestablished](#events.syncestablished)
 - [syncprogress](#events.syncprogress)
 - [usercount](#events.usercount)
+- [geolocation](#events.geolocation)
 
 <a name="events.connected"></a>**connected** ( )  
 Fires when the client has successfully initiated a server connection.
@@ -601,6 +603,13 @@ Fires when the user count changes. This happens when people join or leave the ro
 
 Parameters:
 - count : Integer
+
+---
+<a name="events.geolocation"></a>**geolocation** (position)  
+Fires when the geolocation of the Client changes. This happens when the geolocation API dispatches a position update. See [Geolocation_API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API) for more info.
+
+Parameters:
+- position : Object
 
 ---
 ## <a name="message"></a>TIMESYNC.Message ##
