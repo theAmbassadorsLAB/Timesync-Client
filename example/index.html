@@ -88,6 +88,7 @@
             <input type="button" id="createroombutton" value="Create Room" onclick="f_CreateRoom();">
             <input type="button" id="joinroombutton" value="Join Room" onclick="f_JoinRoom();">
             <input type="button" id="leaveroombutton" value="Leave Room" onclick="f_LeaveRoom();">
+            <input type="button" id="closeroombutton" value="Close Room" onclick="f_CloseRoom();">
         </div>
 
         <div class="divider"></div>
@@ -155,6 +156,10 @@
 
         function f_LeaveRoom() {
             tsClient.newMsg("leave_room", {}, f_log_response).send();
+        }
+
+        function f_CloseRoom() {
+            tsClient.newMsg("close_room", {}, f_log_response).send();
         }
 
         function f_SendCustomMessage() {
