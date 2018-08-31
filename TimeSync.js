@@ -196,7 +196,7 @@ TIMESYNC.Client = function (cfg) {
         }
 
         this.listeners[type].push(listener);
-        this.log('listener registered', type, listener);
+        this.log('listener registered', type);
 
         return this;
     };
@@ -369,6 +369,8 @@ TIMESYNC.Client.prototype.onConnClose = function () {
 
     this.fireEvent('disconnected');
 
+    this.log('Connection closed');
+
     if (this.config.autoReconnect) {
         setTimeout(function () {
             me.log('autoReconnect is enabled, re-establishing connection');
@@ -385,6 +387,8 @@ TIMESYNC.Client.prototype.onConnMessage = function (e) {
 
     // promote the message object to a TIMESYNC Message instance
     msg = new TIMESYNC.Message(e.data).bind(this);
+
+    this.log('--> ' + msg.getType(), msg);
 
     // check if we have registered a callback on the message
     callback = this.msgCallbacks[msg.id];
@@ -571,6 +575,8 @@ TIMESYNC.Message.prototype.send = function () {
 
             // set the geolocation if needed
             if (client.config.geolocation) { this.setGeolocation(client.geolocation.latitude, client.geolocation.longitude, client.geolocation.accuracy); }
+
+            client.log('<-- ' + this.getType(), this);
 
             conn.send(this);
 
