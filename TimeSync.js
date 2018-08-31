@@ -154,12 +154,16 @@ TIMESYNC.Client = function (cfg) {
 
         } else {
             console.error('Geolocation is not supported by this browser.');
+            this.fireEvent('geolocationerror', {code: 2, message: 'Geolocation is not supported by this browser', PERMISSION_DENIED:1, POSITION_UNAVAILABLE: 2, TIMEOUT: 3});
             return this.config.geolocation = false;
         }
     };
 
     this.handleGeolocationError = function (error) {
         this.geolocation = {};
+
+        this.log('Geolocation error', error);
+        this.fireEvent('geolocationerror', error);
 
         switch(error.code) {
         case error.PERMISSION_DENIED:

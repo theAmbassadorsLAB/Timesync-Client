@@ -567,6 +567,7 @@ Parameters:
 - [syncprogress](#events.syncprogress)
 - [usercount](#events.usercount)
 - [geolocation](#events.geolocation)
+- [geolocationerror](#events.geolocationerror)
 
 <a name="events.connected"></a>**connected** ( )  
 Fires when the client has successfully initiated a server connection.
@@ -610,6 +611,13 @@ Fires when the geolocation of the Client changes. This happens when the geolocat
 
 Parameters:
 - position : Object
+
+---
+<a name="events.geolocationerror"></a>**geolocationerror** (PositionError)  
+Fires when a geolocation error occurs caught by the errorHandler of the geolocation.watchPosition method. See [Geolocation_API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API) for more info.
+
+Parameters:
+- error : PositionError
 
 ---
 ## <a name="message"></a>TIMESYNC.Message ##
